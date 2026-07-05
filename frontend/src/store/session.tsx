@@ -83,7 +83,7 @@ function reducer(state: SessionState, action: Action): SessionState {
   }
 }
 
-const STORAGE_KEY = 'basic-instinct-session-v1';
+const STORAGE_KEY = 'afgh-session-v1';
 
 function load(): SessionState {
   try {
