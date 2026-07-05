@@ -219,7 +219,7 @@ export function UthGame() {
         <div className="seat-label">Dealer {phase === 'done' && dealerCat ? `— ${dealerCat}` : ''}</div>
         <div className="card-row">
           {(round?.dealer ?? []).map((c, i) => (
-            <CardView key={i} card={c} faceDown={phase !== 'done'} />
+            <CardView key={`${c}-${i}`} card={c} faceDown={phase !== 'done'} />
           ))}
           {!round && (
             <>
@@ -232,7 +232,9 @@ export function UthGame() {
         <div className="seat-label">Board</div>
         <div className="card-row">
           {round &&
-            round.board.map((c, i) => <CardView key={i} card={c} faceDown={i >= boardVisible} small={false} />)}
+            round.board.map((c, i) => (
+              <CardView key={`${c}-${i}`} card={c} faceDown={i >= boardVisible} small={false} />
+            ))}
           {!round && [0, 1, 2, 3, 4].map((i) => <CardView key={i} faceDown />)}
         </div>
 
@@ -242,7 +244,7 @@ export function UthGame() {
         </div>
         <div className="card-row">
           {(round?.player ?? []).map((c, i) => (
-            <CardView key={i} card={c} />
+            <CardView key={`${c}-${i}`} card={c} />
           ))}
           {!round && (
             <>

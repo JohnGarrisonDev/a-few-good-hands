@@ -102,14 +102,14 @@ export function ThreeCardGame() {
         <div className="seat-label">Dealer</div>
         <div className="card-row">
           {(round?.dealer ?? [0, 0, 0]).map((c, i) => (
-            <CardView key={i} card={round ? c : undefined} faceDown={!round || phase === 'decide'} />
+            <CardView key={`${c}-${i}`} card={round ? c : undefined} faceDown={!round || phase === 'decide'} />
           ))}
         </div>
 
         <div className="seat-label">Your hand {round && phase !== 'bet' ? `— ${CAT_NAMES[cat3(eval3(round.player[0], round.player[1], round.player[2]))]}` : ''}</div>
         <div className="card-row">
           {(round?.player ?? [0, 0, 0]).map((c, i) => (
-            <CardView key={i} card={round ? c : undefined} faceDown={!round} />
+            <CardView key={`${c}-${i}`} card={round ? c : undefined} faceDown={!round} />
           ))}
         </div>
 

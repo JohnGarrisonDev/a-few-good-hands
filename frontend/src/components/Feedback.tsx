@@ -27,9 +27,11 @@ export function FeedbackPanel({ grade, unitLabel }: Props) {
       {grade === 'pending' && <div className="pending-dot">Crunching the numbers…</div>}
       {grade !== null && grade !== 'pending' && (
         <>
-          <div className="verdict">
-            <span className="thumb">{grade.correct ? '👍' : '👎'}</span>
-            <span>{grade.correct ? 'Correct play' : 'Costly move'}</span>
+          <div className="verdict-wrap" key={`${grade.chosenLabel}|${grade.correct}|${grade.costDollars}`}>
+            <div className="verdict">
+              <span className="thumb">{grade.correct ? '👍' : '👎'}</span>
+              <span>{grade.correct ? 'Correct play' : 'Costly move'}</span>
+            </div>
           </div>
           <div className="detail">
             You chose <strong>{grade.chosenLabel}</strong>.

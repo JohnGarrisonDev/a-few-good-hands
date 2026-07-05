@@ -183,7 +183,7 @@ export function VideoPokerGame() {
                       {r.pays > 0 ? `${r.label} +$${r.pays}` : '—'}
                     </span>
                     {r.cards.map((c, j) => (
-                      <CardView key={j} card={c} small dim={r.pays === 0} />
+                      <CardView key={`${c}-${j}`} card={c} small dim={r.pays === 0} />
                     ))}
                   </div>
                 ))}
@@ -199,7 +199,7 @@ export function VideoPokerGame() {
                 <div className="card-row" style={{ paddingBottom: 20 }}>
                   {(phase === 'hold' ? dealCards : results[0]?.cards ?? dealCards).map((c, i) => (
                     <CardView
-                      key={i}
+                      key={`${c}-${i}`}
                       card={c}
                       selectable={phase === 'hold'}
                       held={phase === 'hold' && holds[i]}

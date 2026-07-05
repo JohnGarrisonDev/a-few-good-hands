@@ -106,9 +106,19 @@ function TopBar() {
         </div>
       </a>
       <div className="spacer" />
+      <button
+        className="anim-toggle"
+        title={session.state.animations ? 'Turn animations off' : 'Turn animations on'}
+        aria-pressed={session.state.animations}
+        onClick={() => session.toggleAnimations()}
+      >
+        {session.state.animations ? '✨ Motion on' : '💤 Motion off'}
+      </button>
       <div className="bankroll-chip">
         <label>Bankroll</label>
-        <span className="amount">${session.state.bankroll.toFixed(2).replace(/\.00$/, '')}</span>
+        <span className="amount" key={session.state.bankroll}>
+          ${session.state.bankroll.toFixed(2).replace(/\.00$/, '')}
+        </span>
       </div>
       <div className="add-funds">
         <input
@@ -185,8 +195,13 @@ function Lobby() {
 
 function Shell() {
   const route = usePathRoute();
+  const session = useSession();
   const game = GAMES.find((g) => g.path === route);
   const isLegal = route === 'legal';
+
+  useEffect(() => {
+    document.body.classList.toggle('reduced-motion', !session.state.animations);
+  }, [session.state.animations]);
 
   useEffect(() => {
     if (game) {

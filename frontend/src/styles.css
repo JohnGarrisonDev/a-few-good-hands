@@ -423,6 +423,81 @@ footer.credits .fine-print {
 .legal-page a { color: var(--gold); }
 .legal-page code { font-family: var(--font-mono); font-size: 12px; }
 
+/* ---------- animations ---------- */
+@keyframes flip-in {
+  0% { transform: perspective(600px) rotateY(90deg) translateY(-6px); opacity: 0; }
+  60% { transform: perspective(600px) rotateY(-12deg); opacity: 1; }
+  100% { transform: perspective(600px) rotateY(0deg); }
+}
+@keyframes back-in {
+  from { transform: translateY(-16px) scale(0.9); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes pop-in {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes rise-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+@keyframes verdict-pop {
+  0% { transform: scale(0.7) rotate(-6deg); opacity: 0; }
+  60% { transform: scale(1.12) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(227, 179, 65, 0); }
+  50% { box-shadow: inset 0 0 24px 0 rgba(227, 179, 65, 0.18); }
+}
+
+.pcard.face { animation: flip-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.pcard.back { animation: back-in 0.3s ease-out backwards; }
+/* stagger cards as they land in a row */
+.card-row .pcard:nth-child(2) { animation-delay: 0.07s; }
+.card-row .pcard:nth-child(3) { animation-delay: 0.14s; }
+.card-row .pcard:nth-child(4) { animation-delay: 0.21s; }
+.card-row .pcard:nth-child(5) { animation-delay: 0.28s; }
+.card-row .pcard:nth-child(6) { animation-delay: 0.35s; }
+.card-row .pcard:nth-child(7) { animation-delay: 0.42s; }
+.vp-hand-row .pcard { animation-duration: 0.3s; }
+
+.result-badge { animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.table-msg { animation: rise-in 0.35s ease-out backwards; }
+.bankroll-chip .amount { display: inline-block; animation: bump 0.4s ease-out; }
+.feedback .verdict-wrap { animation: verdict-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+.hand-block.active { animation: glow-pulse 2.2s ease-in-out infinite; }
+
+.pcard { transition: transform 0.18s ease, outline-color 0.18s ease; }
+button { transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease; }
+button:active:not(:disabled) { transform: scale(0.96); }
+.game-card { transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease; }
+.game-card:hover { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); }
+
+.anim-toggle {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12px;
+}
+.anim-toggle:hover { color: var(--text); border-color: var(--gold-dim); }
+
+/* master off-switch (settings toggle adds .reduced-motion to <body>) */
+body.reduced-motion *,
+body.reduced-motion *::before,
+body.reduced-motion *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* ---------- ads ---------- */
 .ad-slot {
   margin: 28px auto 8px;

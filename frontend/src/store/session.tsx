@@ -12,6 +12,7 @@ export interface GameStats {
 export interface SessionState {
   bankroll: number;
   stats: Record<string, GameStats>;
+  animations: boolean;
 }
 
 const EMPTY_STATS: GameStats = { wagered: 0, decisions: 0, correct: 0, evLost: 0, net: 0, rounds: 0 };
@@ -23,7 +24,8 @@ type Action =
   | { type: 'wager'; game: string; amount: number }
   | { type: 'decision'; game: string; correct: boolean; evLost: number }
   | { type: 'round'; game: string }
-  | { type: 'resetStats'; game: string };
+  | { type: 'resetStats'; game: string }
+  | { type: 'toggleAnimations' };
 
 function statsFor(state: SessionState, game: string): GameStats {
   return state.stats[game] ?? EMPTY_STATS;
@@ -80,22 +82,30 @@ function reducer(state: SessionState, action: Action): SessionState {
     }
     case 'resetStats':
       return { ...state, stats: { ...state.stats, [action.game]: EMPTY_STATS } };
+    case 'toggleAnimations':
+      return { ...state, animations: !state.animations };
   }
 }
 
 const STORAGE_KEY = 'afgh-session-v1';
 
 function load(): SessionState {
+  // default animations off for users who ask the OS for reduced motion
+  const prefersReduced =
+    typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const defaults: SessionState = { bankroll: 1000, stats: {}, animations: !prefersReduced };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as SessionState;
-      if (typeof parsed.bankroll === 'number' && parsed.stats) return parsed;
+      const parsed = JSON.parse(raw) as Partial<SessionState>;
+      if (typeof parsed.bankroll === 'number' && parsed.stats) {
+        return { ...defaults, ...parsed } as SessionState;
+      }
     }
   } catch {
     /* fresh start */
   }
-  return { bankroll: 1000, stats: {} };
+  return defaults;
 }
 
 interface SessionCtx {
@@ -108,6 +118,7 @@ interface SessionCtx {
   round(game: string): void;
   resetStats(game: string): void;
   gameStats(game: string): GameStats;
+  toggleAnimations(): void;
 }
 
 const Ctx = createContext<SessionCtx | null>(null);
@@ -129,6 +140,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     round: (game) => dispatch({ type: 'round', game }),
     resetStats: (game) => dispatch({ type: 'resetStats', game }),
     gameStats: (game) => state.stats[game] ?? EMPTY_STATS,
+    toggleAnimations: () => dispatch({ type: 'toggleAnimations' }),
   };
 
   return <Ctx.Provider value={ctx}>{children}</Ctx.Provider>;

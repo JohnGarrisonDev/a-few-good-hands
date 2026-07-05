@@ -17,6 +17,7 @@ export function CardView({ card, faceDown, small, selectable, held, dim, onClick
     cls.push('back');
     return <div className={cls.join(' ')} />;
   }
+  cls.push('face');
   if (isRed(card)) cls.push('red');
   if (selectable) cls.push('selectable');
   if (held) cls.push('held');

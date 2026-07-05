@@ -88,7 +88,7 @@ export function BlackjackGame() {
         </div>
         <div className="card-row">
           {game.dealerCards.map((c, i) => (
-            <CardView key={i} card={c} faceDown={i === 1 && !game.dealerRevealed} />
+            <CardView key={`${c}-${i}`} card={c} faceDown={i === 1 && !game.dealerRevealed} />
           ))}
         </div>
 
@@ -110,7 +110,7 @@ export function BlackjackGame() {
               </div>
               <div className="card-row">
                 {h.cards.map((c, j) => (
-                  <CardView key={j} card={c} />
+                  <CardView key={`${c}-${j}`} card={c} />
                 ))}
               </div>
             </div>
