@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdSlot } from './components/AdSlot';
-import { IconBlackjack, IconSpade, IconTripleCards, IconVideoPoker, Logo } from './components/icons';
+import { IconBlackjack, IconChevronDown, IconHamburger, IconSpade, IconTripleCards, IconVideoPoker, Logo } from './components/icons';
 import { BlackjackGame } from './games/BlackjackGame';
 import { ThreeCardGame } from './games/ThreeCardGame';
 import { UthGame } from './games/UthGame';
@@ -75,10 +75,15 @@ function usePathRoute(): string {
       const a = (e.target as HTMLElement).closest('a');
       if (!a || a.target === '_blank' || a.origin !== window.location.origin) return;
       e.preventDefault();
+      const target = a.pathname + a.search + a.hash;
       if (a.pathname !== window.location.pathname) {
-        window.history.pushState(null, '', a.pathname);
+        window.history.pushState(null, '', target);
         setRoute(a.pathname.replace(/^\/+|\/+$/g, ''));
-        window.scrollTo(0, 0);
+        if (!a.hash) window.scrollTo(0, 0);
+      } else if (a.hash) {
+        // same page, new anchor (e.g. glossary term links)
+        window.history.pushState(null, '', target);
+        document.getElementById(a.hash.slice(1))?.scrollIntoView({ block: 'start' });
       }
     };
     document.addEventListener('click', onClick);
@@ -95,9 +100,45 @@ function useSeo(title: string, description: string) {
   }, [title, description]);
 }
 
+function GameMenuLinks({ withExtras }: { withExtras?: boolean }) {
+  return (
+    <>
+      {GAMES.map((g) => (
+        <a key={g.path} className="menu-item" href={`/${g.path}`}>
+          <span className="menu-icon">{g.icon}</span>
+          <span>
+            <span className="menu-title">{g.title}</span>
+            <span className="menu-sub">{g.edge()}</span>
+          </span>
+        </a>
+      ))}
+      {withExtras && (
+        <>
+          <div className="menu-divider" />
+          <a className="menu-item plain" href="/learn">Strategy School</a>
+          <a className="menu-item plain" href="/learn/glossary">Glossary</a>
+          <a className="menu-item plain" href="/legal">Legal &amp; Privacy</a>
+        </>
+      )}
+    </>
+  );
+}
+
 function TopBar() {
   const session = useSession();
   const [amount, setAmount] = useState(500);
+  const [open, setOpen] = useState<null | 'games' | 'mobile'>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(null);
+    const id = window.setTimeout(() => document.addEventListener('click', close), 0);
+    return () => {
+      window.clearTimeout(id);
+      document.removeEventListener('click', close);
+    };
+  }, [open]);
+
   return (
     <header className="topbar">
       <a href="/" className="brand">
@@ -108,10 +149,36 @@ function TopBar() {
         </span>
       </a>
       <nav className="site-nav">
-        <a href="/">Play</a>
+        <div className="nav-dropdown">
+          <button
+            className="nav-link-btn"
+            aria-expanded={open === 'games'}
+            onClick={() => setOpen(open === 'games' ? null : 'games')}
+          >
+            Games <IconChevronDown />
+          </button>
+          {open === 'games' && (
+            <div className="games-menu">
+              <GameMenuLinks />
+            </div>
+          )}
+        </div>
         <a href="/learn">Learn</a>
       </nav>
       <div className="spacer" />
+      <button
+        className="hamburger"
+        aria-label="Menu"
+        aria-expanded={open === 'mobile'}
+        onClick={() => setOpen(open === 'mobile' ? null : 'mobile')}
+      >
+        <IconHamburger />
+      </button>
+      {open === 'mobile' && (
+        <div className="mobile-menu">
+          <GameMenuLinks withExtras />
+        </div>
+      )}
       <button
         className="anim-toggle"
         title={session.state.animations ? 'Turn animations off' : 'Turn animations on'}
@@ -145,7 +212,6 @@ function TopBar() {
 }
 
 function Lobby() {
-  const edges = useMemo(() => GAMES.map((g) => g.edge()), []);
   useSeo(
     `${SITE_NAME} — Free Casino Strategy Trainer | Blackjack, Video Poker, Ultimate Texas Hold'em`,
     'Free casino strategy trainer. Every blackjack, video poker, Ultimate Texas Hold\'em and Three Card Poker decision graded against the real math. No real money, ever.',
@@ -158,13 +224,11 @@ function Lobby() {
         cost in expected value, and watch your personal house edge converge on perfect play. Free, play-money
         only. New to a game? <a href="/learn">Study the strategy first</a>.
       </p>
-      <div className="game-grid">
-        {GAMES.map((g, i) => (
-          <a key={g.path} className="game-card" href={`/${g.path}`}>
-            <div className="icon">{g.icon}</div>
-            <h3>{g.title}</h3>
-            <div className="rules">{g.rules}</div>
-            <div className="edge-tag">{edges[i]}</div>
+      <div className="quick-links">
+        {GAMES.map((g) => (
+          <a key={g.path} className="quick-link" href={`/${g.path}`}>
+            <span className="menu-icon">{g.icon}</span>
+            {g.title}
           </a>
         ))}
       </div>

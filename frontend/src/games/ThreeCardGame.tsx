@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BetControl } from '../components/BetControl';
 import { CardView } from '../components/CardView';
 import { EdgePanel } from '../components/EdgePanel';
-import { FeedbackPanel, GradeDisplay } from '../components/Feedback';
+import { FeedbackPanel, GradeDisplay, VerdictChip } from '../components/Feedback';
 import { Card, freshDeck, shuffle } from '../lib/cards';
 import { anteBonus, cat3, dealerQualifies3, eval3, threeCardAnalysis } from '../lib/threecard/ev';
 import { useSession } from '../store/session';
@@ -96,6 +96,7 @@ export function ThreeCardGame() {
       <div className="table-panel">
         <div className="game-title-row">
           <h2>Three Card Poker</h2>
+          <VerdictChip grade={grade} />
           <span className="rules-note">ante + play · dealer qualifies with Q-high · ante bonus on straight+</span>
         </div>
 
@@ -143,12 +144,12 @@ export function ThreeCardGame() {
       </div>
 
       <div className="side-panel">
+        <FeedbackPanel grade={grade} unitLabel="antes" />
         <EdgePanel
           gameId={GAME}
           impliedEdgePct={IMPLIED_EDGE}
           unitNote="Edge as % of one ante (ante + play, no Pair Plus). Decision EVs are exact — every possible dealer hand is enumerated."
         />
-        <FeedbackPanel grade={grade} unitLabel="antes" />
       </div>
     </div>
   );

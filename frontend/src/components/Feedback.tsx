@@ -1,4 +1,4 @@
-import { IconThumbDown, IconThumbUp } from './icons';
+import { IconCheck, IconThumbDown, IconThumbUp, IconX } from './icons';
 
 export interface EVLine {
   label: string;
@@ -19,6 +19,18 @@ export interface GradeDisplay {
 interface Props {
   grade: GradeDisplay | 'pending' | null;
   unitLabel: string; // e.g. "per $ bet" / "in antes"
+}
+
+/** compact ✓/✗ chip for the game title row — instant verdict without scrolling */
+export function VerdictChip({ grade }: { grade: GradeDisplay | 'pending' | null }) {
+  if (grade === null) return null;
+  if (grade === 'pending') return <span className="verdict-chip pending">…</span>;
+  return (
+    <span className={`verdict-chip ${grade.correct ? 'good' : 'bad'}`} key={`${grade.chosenLabel}|${grade.correct}|${grade.costDollars}`}>
+      {grade.correct ? <IconCheck /> : <IconX />}
+      {grade.correct ? 'Correct' : 'Incorrect'}
+    </span>
+  );
 }
 
 export function FeedbackPanel({ grade, unitLabel }: Props) {

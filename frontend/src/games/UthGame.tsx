@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BetControl } from '../components/BetControl';
 import { CardView } from '../components/CardView';
 import { EdgePanel } from '../components/EdgePanel';
-import { FeedbackPanel, GradeDisplay } from '../components/Feedback';
+import { FeedbackPanel, GradeDisplay, VerdictChip } from '../components/Feedback';
 import { Card, freshDeck, shuffle } from '../lib/cards';
 import { catOf, eval7 } from '../lib/poker/eval7';
 import { FlopEV, PreflopEV, RiverEV } from '../lib/uth/ev';
@@ -213,6 +213,7 @@ export function UthGame() {
       <div className="table-panel">
         <div className="game-title-row">
           <h2>Ultimate Texas Hold&#39;em</h2>
+          <VerdictChip grade={grade} />
           <span className="rules-note">ante + blind · check/bet 4× → 2× → 1×/fold · dealer opens with a pair</span>
         </div>
 
@@ -324,12 +325,12 @@ export function UthGame() {
       </div>
 
       <div className="side-panel">
+        <FeedbackPanel grade={grade} unitLabel="antes" />
         <EdgePanel
           gameId={GAME}
           impliedEdgePct={IMPLIED_EDGE}
           unitNote="Edge as % of one ante (industry convention). Blind pays on straight or better; ante pushes unless the dealer opens with a pair. Flop and river grades are exact; preflop uses the optimal chart with a Monte Carlo EV estimate."
         />
-        <FeedbackPanel grade={grade} unitLabel="antes" />
       </div>
     </div>
   );

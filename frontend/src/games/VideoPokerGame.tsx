@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BetControl } from '../components/BetControl';
 import { CardView } from '../components/CardView';
 import { EdgePanel } from '../components/EdgePanel';
-import { FeedbackPanel, GradeDisplay } from '../components/Feedback';
+import { FeedbackPanel, GradeDisplay, VerdictChip } from '../components/Feedback';
 import { Card, cardLabel, freshDeck, shuffle } from '../lib/cards';
 import { HoldAnalysis } from '../lib/videopoker/ev';
 import { PAYTABLES, paytableById } from '../lib/videopoker/paytables';
@@ -182,6 +182,7 @@ export function VideoPokerGame() {
       <div className="table-panel">
         <div className="game-title-row">
           <h2>Video Poker</h2>
+          <VerdictChip grade={grade} />
           <span className="rules-note">{paytable.name} · max-coin pays</span>
         </div>
 
@@ -276,12 +277,12 @@ export function VideoPokerGame() {
       </div>
 
       <div className="side-panel">
+        <FeedbackPanel grade={grade} unitLabel="× bet" />
         <EdgePanel
           gameId={GAME}
           impliedEdgePct={impliedEdge}
           unitNote={`Edge as % of total amount bet. ${paytable.name} returns ${paytable.returnPct}% with perfect play${impliedEdge < 0 ? ' — a player edge!' : ''}. Hold EVs are exact (all 32 holds × every possible draw).`}
         />
-        <FeedbackPanel grade={grade} unitLabel="× bet" />
         <div className="panel">
           <h4>Pay Table (per 1 bet)</h4>
           <table className="paytable-list">
