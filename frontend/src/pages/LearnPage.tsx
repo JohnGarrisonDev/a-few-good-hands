@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { actionEVs, bestAction, HandState } from '../lib/blackjack/ev';
 import { SITE_NAME } from '../config';
 
@@ -204,14 +204,57 @@ export const GLOSSARY: GlossaryEntry[] = [
 
 const GLOSSARY_MAP = new Map(GLOSSARY.map((g) => [g.key, g]));
 
-/** inline glossary term: dotted underline, hover popover, tap/click goes to the glossary entry */
+const TermSheetCtx = createContext<(entry: GlossaryEntry) => void>(() => {});
+
+/**
+ * Inline glossary term: dotted underline with a hover popover; clicking opens a
+ * dismissable bottom sheet with the full definition — the reader never leaves the page.
+ * The href stays for crawlers and middle-click, but normal clicks are intercepted.
+ */
 function T({ k, children }: { k: string; children: ReactNode }) {
+  const openSheet = useContext(TermSheetCtx);
   const entry = GLOSSARY_MAP.get(k);
   if (!entry) return <>{children}</>;
   return (
-    <a className="term" href={`/learn/glossary#${entry.key}`} data-tip={entry.short}>
+    <a
+      className="term"
+      href={`/learn/glossary#${entry.key}`}
+      data-tip={entry.short}
+      onClick={(e) => {
+        e.preventDefault();
+        openSheet(entry);
+      }}
+    >
       {children}
     </a>
+  );
+}
+
+function TermSheet({ entry, onClose }: { entry: GlossaryEntry | null; onClose: () => void }) {
+  useEffect(() => {
+    if (!entry) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [entry, onClose]);
+
+  if (!entry) return null;
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div className="term-sheet" role="dialog" aria-modal="true" aria-label={entry.term} onClick={(e) => e.stopPropagation()}>
+        <div className="sheet-grip" />
+        <div className="sheet-head">
+          <h3>{entry.term}</h3>
+          <button className="sheet-close" aria-label="Close" onClick={onClose}>✕</button>
+        </div>
+        <p>{entry.long}</p>
+        <a className="sheet-more" href={`/learn/glossary#${entry.key}`} onClick={onClose}>
+          Browse the full glossary →
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -685,6 +728,7 @@ const TOPICS: Record<string, { component: () => JSX.Element; title: string; desc
 
 export function LearnPage({ topic }: { topic: string }) {
   const entry = TOPICS[topic] ?? TOPICS[''];
+  const [sheetEntry, setSheetEntry] = useState<GlossaryEntry | null>(null);
   useEffect(() => {
     document.title = entry.title;
     const meta = document.querySelector('meta[name="description"]');
@@ -697,15 +741,18 @@ export function LearnPage({ topic }: { topic: string }) {
   }, [entry]);
   const Body = entry.component;
   return (
-    <div className="learn-page">
-      <nav className="learn-nav">
-        {Object.entries(TOPICS).map(([key, t]) => (
-          <a key={key} href={key ? `/learn/${key}` : '/learn'} className={entry === t ? 'active' : ''}>
-            {t.nav}
-          </a>
-        ))}
-      </nav>
-      <Body />
-    </div>
+    <TermSheetCtx.Provider value={setSheetEntry}>
+      <div className="learn-page">
+        <nav className="learn-nav">
+          {Object.entries(TOPICS).map(([key, t]) => (
+            <a key={key} href={key ? `/learn/${key}` : '/learn'} className={entry === t ? 'active' : ''}>
+              {t.nav}
+            </a>
+          ))}
+        </nav>
+        <Body />
+      </div>
+      <TermSheet entry={sheetEntry} onClose={() => setSheetEntry(null)} />
+    </TermSheetCtx.Provider>
   );
 }

@@ -124,9 +124,63 @@ function GameMenuLinks({ withExtras }: { withExtras?: boolean }) {
   );
 }
 
-function TopBar() {
+function AddFundsModal({ onClose }: { onClose: () => void }) {
   const session = useSession();
   const [amount, setAmount] = useState(500);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const add = () => {
+    session.addFunds(amount);
+    onClose();
+  };
+
+  return (
+    <div className="sheet-backdrop" onClick={onClose}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label="Add funds" onClick={(e) => e.stopPropagation()}>
+        <div className="sheet-head">
+          <h3>Add to your bankroll</h3>
+          <button className="sheet-close" aria-label="Close" onClick={onClose}>✕</button>
+        </div>
+        <p className="modal-note">
+          It&#39;s play money and it&#39;s 100% free — top up as often as you like. The only thing you can&#39;t buy
+          back is the EV you gave up. 😉
+        </p>
+        <div className="modal-chips">
+          {[100, 500, 1000, 5000].map((v) => (
+            <button key={v} className={`chip-btn ${amount === v ? 'active' : ''}`} onClick={() => setAmount(v)}>
+              ${v.toLocaleString()}
+            </button>
+          ))}
+        </div>
+        <div className="modal-row">
+          <input
+            type="number"
+            min={1}
+            value={amount}
+            autoFocus
+            onChange={(e) => setAmount(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') add();
+            }}
+          />
+          <button className="btn-gold" onClick={add}>
+            Add ${amount.toLocaleString()}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TopBar() {
+  const session = useSession();
+  const [addOpen, setAddOpen] = useState(false);
   const [open, setOpen] = useState<null | 'games' | 'mobile'>(null);
 
   useEffect(() => {
@@ -196,17 +250,10 @@ function TopBar() {
           ${session.state.bankroll.toFixed(2).replace(/\.00$/, '')}
         </span>
       </div>
-      <div className="add-funds">
-        <input
-          type="number"
-          min={1}
-          value={amount}
-          onChange={(e) => setAmount(Math.max(1, Math.floor(Number(e.target.value) || 1)))}
-        />
-        <button className="btn-gold" onClick={() => session.addFunds(amount)}>
-          + Add funds
-        </button>
-      </div>
+      <button className="btn-gold" onClick={() => setAddOpen(true)}>
+        + Add
+      </button>
+      {addOpen && <AddFundsModal onClose={() => setAddOpen(false)} />}
     </header>
   );
 }
