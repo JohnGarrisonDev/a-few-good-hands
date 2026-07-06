@@ -1,4 +1,1 @@
-# ads.txt for afewgoodhands.com
-# After AdSense approval, replace pub-0000000000000000 below with your real
-# publisher ID (the same one set in src/config.ts) and redeploy.
-# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-5008239172006905, DIRECT, f08c47fec0942fa0

@@ -7,13 +7,11 @@ export const COPYRIGHT_OWNER = 'John Garrison';
 export const COPYRIGHT_YEAR = 2026;
 
 /**
- * Google AdSense publisher ID, e.g. 'ca-pub-1234567890123456'.
- * Leave empty until the AdSense account is approved — ad units render nothing
- * (and the AdSense script is not loaded) while this is blank.
- * After approval: 1) paste the ID here, 2) update public/ads.txt with the same
- * numeric ID, 3) rebuild and redeploy.
+ * Google AdSense publisher ID. The verification script tag lives in index.html;
+ * this constant gates the ad units themselves. Ad units also need slot ids
+ * below (created in the AdSense dashboard after approval) before they render.
  */
-export const ADSENSE_CLIENT = '';
+export const ADSENSE_CLIENT = 'ca-pub-5008239172006905';
 
 /** default ad slot ids by placement — create these in the AdSense dashboard */
 export const ADSENSE_SLOTS: Record<string, string> = {

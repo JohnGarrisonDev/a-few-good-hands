@@ -11,6 +11,8 @@ let scriptInjected = false;
 function ensureAdsenseScript() {
   if (scriptInjected || !ADSENSE_CLIENT) return;
   scriptInjected = true;
+  // the verification snippet in index.html already loads the library
+  if (document.querySelector('script[src*="adsbygoogle.js"]')) return;
   const s = document.createElement('script');
   s.async = true;
   s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
