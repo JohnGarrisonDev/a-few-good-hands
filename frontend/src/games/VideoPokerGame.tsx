@@ -10,6 +10,7 @@ import { useSession } from '../store/session';
 
 const GAME = 'videopoker';
 const HAND_COUNTS = [1, 3, 5, 10];
+const REVEAL_STEP_MS = 380;
 
 interface HandResult {
   cards: Card[];
@@ -26,18 +27,27 @@ export function VideoPokerGame() {
   const [dealCards, setDealCards] = useState<Card[]>([]);
   const [holds, setHolds] = useState<boolean[]>([false, false, false, false, false]);
   const [results, setResults] = useState<HandResult[]>([]);
+  const [revealed, setRevealed] = useState(0); // hands whose draws are visible
   const [grade, setGrade] = useState<GradeDisplay | 'pending' | null>(null);
   const [totalWon, setTotalWon] = useState(0);
 
   const workerRef = useRef<Worker | null>(null);
   const analysisRef = useRef<Promise<HoldAnalysis> | null>(null);
   const requestIdRef = useRef(0);
+  const revealTimer = useRef<number | null>(null);
 
   const paytable = paytableById(paytableId);
   const impliedEdge = 100 - paytable.returnPct;
   const totalBet = betPerHand * numHands;
+  const fullyRevealed = revealed >= numHands;
 
-  useEffect(() => () => workerRef.current?.terminate(), []);
+  useEffect(
+    () => () => {
+      workerRef.current?.terminate();
+      if (revealTimer.current !== null) window.clearInterval(revealTimer.current);
+    },
+    [],
+  );
 
   function analyze(deal: Card[]): Promise<HoldAnalysis> {
     if (!workerRef.current) {
@@ -59,8 +69,16 @@ export function VideoPokerGame() {
     });
   }
 
+  function stopRevealTimer() {
+    if (revealTimer.current !== null) {
+      window.clearInterval(revealTimer.current);
+      revealTimer.current = null;
+    }
+  }
+
   function onDeal() {
     if (session.state.bankroll < totalBet) return;
+    stopRevealTimer();
     session.spend(GAME, totalBet);
     session.wager(GAME, totalBet);
     session.round(GAME);
@@ -69,6 +87,7 @@ export function VideoPokerGame() {
     setDealCards(deal);
     setHolds([false, false, false, false, false]);
     setResults([]);
+    setRevealed(0);
     setGrade(null);
     setTotalWon(0);
     setPhase('hold');
@@ -99,6 +118,19 @@ export function VideoPokerGame() {
     setPhase('done');
     if (won > 0) session.receive(GAME, won);
 
+    // reveal draws hand by hand, like a live multi-hand machine
+    if (!session.state.animations || numHands === 1) {
+      setRevealed(numHands);
+    } else {
+      setRevealed(1);
+      let shown = 1;
+      revealTimer.current = window.setInterval(() => {
+        shown++;
+        setRevealed(shown);
+        if (shown >= numHands) stopRevealTimer();
+      }, REVEAL_STEP_MS);
+    }
+
     const analysis = await analysisRef.current!;
     const userEv = analysis.evs[userMask];
     const correct = userEv >= analysis.bestEv - 1e-9;
@@ -114,27 +146,36 @@ export function VideoPokerGame() {
       bestLabel: holdLabel(analysis.bestMask),
       costDollars: evLost,
       lines: [
-        {
-          label: 'Your hold',
-          ev: userEv,
-          isBest: correct,
-          isChosen: true,
-        },
-        ...(correct
-          ? []
-          : [
-              {
-                label: 'Best hold',
-                ev: analysis.bestEv,
-                isBest: true,
-                isChosen: false,
-              },
-            ]),
+        { label: 'Your hold', ev: userEv, isBest: correct, isChosen: true },
+        ...(correct ? [] : [{ label: 'Best hold', ev: analysis.bestEv, isBest: true, isChosen: false }]),
       ],
     });
   }
 
-  const wonLabels = new Set(results.filter((r) => r.pays > 0).map((r) => r.label));
+  const wonLabels = new Set(fullyRevealed ? results.filter((r) => r.pays > 0).map((r) => r.label) : []);
+
+  /** one small upper row for hand index h (1..numHands-1) */
+  function upperRow(h: number) {
+    const isRevealed = phase === 'done' && h < revealed;
+    const r = results[h];
+    return (
+      <div key={h} className="vp-hand-row">
+        <span className="vp-hand-label">
+          {isRevealed ? (r.pays > 0 ? `${r.label} +$${r.pays}` : '—') : ''}
+        </span>
+        {dealCards.map((c, j) => {
+          if (isRevealed) {
+            return <CardView key={`${r.cards[j]}-${j}`} card={r.cards[j]} small dim={r.pays === 0} />;
+          }
+          return holds[j] ? (
+            <CardView key={`${c}-${j}`} card={c} small />
+          ) : (
+            <CardView key={`back-${j}`} faceDown small />
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="game-page">
@@ -175,46 +216,35 @@ export function VideoPokerGame() {
 
         {phase !== 'bet' && (
           <>
-            {phase === 'done' && numHands > 1 && (
-              <div style={{ marginBottom: 12, maxHeight: 340, overflowY: 'auto' }}>
-                {results.map((r, i) => (
-                  <div key={i} className="vp-hand-row">
-                    <span className="vp-hand-label">
-                      {r.pays > 0 ? `${r.label} +$${r.pays}` : '—'}
-                    </span>
-                    {r.cards.map((c, j) => (
-                      <CardView key={`${c}-${j}`} card={c} small dim={r.pays === 0} />
-                    ))}
-                  </div>
-                ))}
+            {numHands > 1 && (
+              <div style={{ marginBottom: 14, maxHeight: 380, overflowY: 'auto' }}>
+                {Array.from({ length: numHands - 1 }, (_, i) => numHands - 1 - i).map(upperRow)}
               </div>
             )}
 
-            {(phase === 'hold' || numHands === 1) && (
-              <>
-                <div className="seat-label">
-                  {phase === 'hold' ? 'Tap cards to hold, then draw' : results[0]?.label ?? ''}
-                  {phase === 'done' && results[0] && results[0].pays > 0 && ` +$${results[0].pays}`}
-                </div>
-                <div className="card-row" style={{ paddingBottom: 20 }}>
-                  {(phase === 'hold' ? dealCards : results[0]?.cards ?? dealCards).map((c, i) => (
-                    <CardView
-                      key={`${c}-${i}`}
-                      card={c}
-                      selectable={phase === 'hold'}
-                      held={phase === 'hold' && holds[i]}
-                      onClick={
-                        phase === 'hold'
-                          ? () => setHolds((h) => h.map((v, j) => (j === i ? !v : v)))
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              </>
-            )}
+            <div className="seat-label">
+              {phase === 'hold'
+                ? 'Tap cards to hold, then draw'
+                : revealed >= 1
+                  ? `${results[0].label}${results[0].pays > 0 ? ` +$${results[0].pays}` : ''}`
+                  : ''}
+            </div>
+            <div className="card-row" style={{ paddingBottom: 20 }}>
+              {(phase === 'hold' ? dealCards : results[0]?.cards ?? dealCards).map((c, i) => (
+                <CardView
+                  key={`${c}-${i}`}
+                  card={c}
+                  selectable={phase === 'hold'}
+                  held={phase === 'hold' && holds[i]}
+                  dim={phase === 'done' && numHands > 1 && revealed >= 1 && results[0].pays === 0}
+                  onClick={
+                    phase === 'hold' ? () => setHolds((h) => h.map((v, j) => (j === i ? !v : v))) : undefined
+                  }
+                />
+              ))}
+            </div>
 
-            {phase === 'done' && (
+            {phase === 'done' && fullyRevealed && (
               <div className={`table-msg ${totalWon > totalBet ? 'win' : totalWon === 0 ? 'lose' : ''}`}>
                 {totalWon > 0 ? `Returned $${totalWon} on $${totalBet} bet.` : `No winners — $${totalBet} to the house.`}
               </div>
@@ -227,12 +257,16 @@ export function VideoPokerGame() {
                 </button>
               )}
               {phase === 'done' && (
-                <button className="btn-action primary" onClick={onDeal} disabled={session.state.bankroll < totalBet}>
+                <button
+                  className="btn-action primary"
+                  onClick={onDeal}
+                  disabled={!fullyRevealed || session.state.bankroll < totalBet}
+                >
                   Deal again — ${totalBet}
                 </button>
               )}
               {phase === 'done' && (
-                <button className="btn-action" onClick={() => setPhase('bet')}>
+                <button className="btn-action" disabled={!fullyRevealed} onClick={() => setPhase('bet')}>
                   Change game / bet
                 </button>
               )}

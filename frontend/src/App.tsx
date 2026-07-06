@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AdSlot } from './components/AdSlot';
+import { IconBlackjack, IconSpade, IconTripleCards, IconVideoPoker, Logo } from './components/icons';
 import { BlackjackGame } from './games/BlackjackGame';
 import { ThreeCardGame } from './games/ThreeCardGame';
 import { UthGame } from './games/UthGame';
 import { VideoPokerGame } from './games/VideoPokerGame';
 import { houseEdge } from './lib/blackjack/ev';
+import { LearnPage } from './pages/LearnPage';
 import { LegalPage } from './pages/LegalPage';
 import { SessionProvider, useSession } from './store/session';
 import { COPYRIGHT_OWNER, COPYRIGHT_YEAR, SITE_NAME } from './config';
@@ -12,7 +14,7 @@ import { COPYRIGHT_OWNER, COPYRIGHT_YEAR, SITE_NAME } from './config';
 const GAMES = [
   {
     path: 'blackjack',
-    icon: '🂡',
+    icon: <IconBlackjack />,
     title: 'Blackjack',
     seoTitle: 'Blackjack Basic Strategy Trainer — Free, Every Decision Graded',
     description:
@@ -23,7 +25,7 @@ const GAMES = [
   },
   {
     path: 'videopoker',
-    icon: '🎰',
+    icon: <IconVideoPoker />,
     title: 'Video Poker',
     seoTitle: 'Video Poker Trainer — Jacks or Better, Bonus, Deuces Wild (Exact EV)',
     description:
@@ -34,7 +36,7 @@ const GAMES = [
   },
   {
     path: 'uth',
-    icon: '♠️',
+    icon: <IconSpade />,
     title: "Ultimate Texas Hold'em",
     seoTitle: "Ultimate Texas Hold'em Strategy Trainer — 4x, 2x, 1x Decisions Graded",
     description:
@@ -45,7 +47,7 @@ const GAMES = [
   },
   {
     path: 'threecard',
-    icon: '🃏',
+    icon: <IconTripleCards />,
     title: 'Three Card Poker',
     seoTitle: 'Three Card Poker Strategy Trainer — Learn the Q-6-4 Rule',
     description:
@@ -68,7 +70,6 @@ function usePathRoute(): string {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
   useEffect(() => {
-    // intercept same-origin link clicks for SPA navigation
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = (e.target as HTMLElement).closest('a');
@@ -99,12 +100,17 @@ function TopBar() {
   const [amount, setAmount] = useState(500);
   return (
     <header className="topbar">
-      <a href="/" style={{ color: 'inherit' }}>
-        <div className="brand">
-          {SITE_NAME}
+      <a href="/" className="brand">
+        <Logo />
+        <span className="wordmark">
+          A Few Good <em>Hands</em>
           <small>casino strategy trainer</small>
-        </div>
+        </span>
       </a>
+      <nav className="site-nav">
+        <a href="/">Play</a>
+        <a href="/learn">Learn</a>
+      </nav>
       <div className="spacer" />
       <button
         className="anim-toggle"
@@ -112,7 +118,10 @@ function TopBar() {
         aria-pressed={session.state.animations}
         onClick={() => session.toggleAnimations()}
       >
-        {session.state.animations ? '✨ Motion on' : '💤 Motion off'}
+        <span className="track">
+          <span className="knob" />
+        </span>
+        <span className="label-text">Motion</span>
       </button>
       <div className="bankroll-chip">
         <label>Bankroll</label>
@@ -145,9 +154,9 @@ function Lobby() {
     <div className="lobby">
       <h1>You want the truth about your play?</h1>
       <p className="tagline">
-        Every decision you make at the table gets graded against the actual math — see exactly what your
-        mistakes cost in expected value, and watch your personal house edge converge on perfect play. Free,
-        play-money only.
+        Every decision you make at the table gets graded against the actual math — see exactly what your mistakes
+        cost in expected value, and watch your personal house edge converge on perfect play. Free, play-money
+        only. New to a game? <a href="/learn">Study the strategy first</a>.
       </p>
       <div className="game-grid">
         {GAMES.map((g, i) => (
@@ -161,6 +170,8 @@ function Lobby() {
       </div>
 
       <AdSlot placement="lobby" />
+
+      <div className="suit-rule">♠ ♥ ♦ ♣</div>
 
       <section className="seo-copy">
         <h2>Why train the decisions?</h2>
@@ -180,7 +191,8 @@ function Lobby() {
           cards against every possible draw. Ultimate Texas Hold&#39;em river and flop decisions enumerate every
           dealer hand exactly. Blackjack decisions come from a full expected-value engine. When you make a mistake,
           you see its cost in dollars and cents, and your session&#39;s <strong>actual house edge</strong> updates
-          so you can watch it converge toward the theoretical minimum as your play improves.
+          so you can watch it converge toward the theoretical minimum as your play improves. Want the theory first?
+          The <a href="/learn">Strategy School</a> has charts and hold lists for every game here.
         </p>
         <h2>Free means free</h2>
         <p>
@@ -198,6 +210,8 @@ function Shell() {
   const session = useSession();
   const game = GAMES.find((g) => g.path === route);
   const isLegal = route === 'legal';
+  const isLearn = route === 'learn' || route.startsWith('learn/');
+  const learnTopic = route.startsWith('learn/') ? route.slice(6) : '';
 
   useEffect(() => {
     document.body.classList.toggle('reduced-motion', !session.state.animations);
@@ -216,16 +230,17 @@ function Shell() {
       <TopBar />
       {game ? (
         <>
-          <div style={{ maxWidth: 1240, margin: '0 auto', padding: '16px 24px 0', width: '100%' }}>
-            <a className="back-link" href="/">
-              ← All games
-            </a>
+          <div className="crumb-row" style={{ maxWidth: 1240, margin: '0 auto', padding: '14px 24px 0', width: '100%' }}>
+            <a href="/">← All games</a>
+            <a href={`/learn/${game.path}`}>Study this game&#39;s strategy →</a>
           </div>
           <game.component />
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px', width: '100%' }}>
             <AdSlot placement="sidebar" />
           </div>
         </>
+      ) : isLearn ? (
+        <LearnPage topic={learnTopic} />
       ) : isLegal ? (
         <LegalPage />
       ) : (
@@ -233,7 +248,8 @@ function Shell() {
       )}
       <footer className="credits">
         <div>
-          © {COPYRIGHT_YEAR} {COPYRIGHT_OWNER}. All rights reserved. · <a href="/legal">Legal, Privacy &amp; Disclaimers</a>
+          © {COPYRIGHT_YEAR} {COPYRIGHT_OWNER}. All rights reserved. · <a href="/learn">Strategy School</a> ·{' '}
+          <a href="/legal">Legal, Privacy &amp; Disclaimers</a>
         </div>
         <div className="fine-print">
           Free educational strategy trainer. Play money only — no real-money gambling, no prizes of any value. For

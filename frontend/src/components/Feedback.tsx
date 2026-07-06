@@ -1,3 +1,5 @@
+import { IconThumbDown, IconThumbUp } from './icons';
+
 export interface EVLine {
   label: string;
   ev: number;
@@ -28,10 +30,10 @@ export function FeedbackPanel({ grade, unitLabel }: Props) {
       {grade !== null && grade !== 'pending' && (
         <>
           <div className="verdict-wrap" key={`${grade.chosenLabel}|${grade.correct}|${grade.costDollars}`}>
-            <div className="verdict">
-              <span className="thumb">{grade.correct ? '👍' : '👎'}</span>
-              <span>{grade.correct ? 'Correct play' : 'Costly move'}</span>
-            </div>
+            <span className="verdict-badge">
+              {grade.correct ? <IconThumbUp /> : <IconThumbDown />}
+              {grade.correct ? 'Correct play' : 'Costly move'}
+            </span>
           </div>
           <div className="detail">
             You chose <strong>{grade.chosenLabel}</strong>.
