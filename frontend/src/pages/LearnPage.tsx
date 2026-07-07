@@ -1,5 +1,5 @@
-import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { actionEVs, bestAction, HandState } from '../lib/blackjack/ev';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { Legend, StratChart, useBlackjackCharts } from '../components/BlackjackCharts';
 import { SITE_NAME } from '../config';
 
 // ---------------------------------------------------------------- glossary
@@ -200,6 +200,36 @@ export const GLOSSARY: GlossaryEntry[] = [
     short: 'A-K-Q-J-10 all in one suit — the jackpot hand of video poker.',
     long: 'The best possible poker hand and the jackpot on every video poker pay table, typically paying 800× your bet at max coins. It arrives about once per 40,000 hands of Jacks or Better — rare enough to be special, common enough that strategy genuinely chases it.',
   },
+  {
+    key: 'rng',
+    term: 'RNG (random number generator)',
+    short: 'The chip that decides every slot result the instant you press spin — the reels are just animation.',
+    long: 'Every modern slot machine runs a random number generator: software that produces thousands of numbers per second, around the clock. The moment you press spin, the current number decides the outcome; the spinning reels, near misses and celebrations that follow are a show, replaying a decision already made. Because the RNG never stops and has no memory, every spin is independent — a machine is never "due," "hot" or "cold."',
+  },
+  {
+    key: 'hit-frequency',
+    term: 'Hit frequency',
+    short: 'How often a slot lands any win at all — separate from how much it pays back.',
+    long: 'The percentage of spins that return something. A 25% hit frequency means roughly one spin in four pays — though on multi-line slots many "wins" are smaller than the bet that produced them. Hit frequency and return are independent: two machines can both pay back 94% while one pays little and often and the other pays rarely and big. That difference is volatility.',
+  },
+  {
+    key: 'volatility',
+    term: 'Volatility (slots)',
+    short: 'How a slot distributes its payback: many small wins (low) or rare big ones (high).',
+    long: 'Slot-world jargon for variance. A low-volatility machine pays small amounts frequently — your bankroll erodes slowly and smoothly. A high-volatility machine funnels its payback into rare, large hits — long dry spells punctuated by big wins. Same average return, wildly different rides. Matching a machine\'s volatility to your bankroll and temperament is the single most useful slot skill.',
+  },
+  {
+    key: 'progressive',
+    term: 'Progressive jackpot',
+    short: 'A jackpot that grows as people play, funded by a slice of every bet.',
+    long: 'A jackpot meter that climbs as money is wagered, because a small percentage of each bet feeds it. Standalone progressives build from one machine; local progressives link machines in one casino; wide-area progressives link machines across many casinos into life-changing (and lottery-rare) prizes. The bigger the network, the bigger the jackpot — and the smaller your odds of being the one who hits it.',
+  },
+  {
+    key: 'must-hit-by',
+    term: 'Must-hit-by',
+    short: 'A progressive that is guaranteed to pay before its meter reaches a printed ceiling.',
+    long: 'Some progressives display a cap — "must hit by $500" — and are guaranteed to pay out before the meter reaches it. Unlike ordinary progressives, that guarantee creates a rare sliver of real math for slot players: the closer the meter sits to its ceiling, the better the bet becomes, and a meter close enough to the cap can briefly favor the player. Finding one that close is hard work — but it\'s the one honest "edge" in the slot world.',
+  },
 ];
 
 const GLOSSARY_MAP = new Map(GLOSSARY.map((g) => [g.key, g]));
@@ -281,98 +311,6 @@ function GlossaryLesson() {
   );
 }
 
-// ---------------------------------------------------------------- blackjack charts
-
-const DEALER_UPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-const UP_LABELS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'A'];
-
-type Cell = 'H' | 'S' | 'D' | 'Ds' | 'P';
-
-function decide(state: HandState, up: number): Cell {
-  const evs = actionEVs(state, up);
-  const best = bestAction(evs);
-  if (best === 'split') return 'P';
-  if (best === 'double') return evs.stand! > evs.hit! ? 'Ds' : 'D';
-  return best === 'hit' ? 'H' : 'S';
-}
-
-function useBlackjackCharts() {
-  return useMemo(() => {
-    const hard: { label: string; cells: Cell[] }[] = [];
-    for (let total = 8; total <= 17; total++) {
-      hard.push({
-        label: String(total),
-        cells: DEALER_UPS.map((up) =>
-          decide({ total, soft: false, pairValue: null, isTwoCards: true, canSplit: false }, up),
-        ),
-      });
-    }
-    const soft: { label: string; cells: Cell[] }[] = [];
-    for (let total = 13; total <= 20; total++) {
-      soft.push({
-        label: `A,${total - 11}`,
-        cells: DEALER_UPS.map((up) =>
-          decide({ total, soft: true, pairValue: null, isTwoCards: true, canSplit: false }, up),
-        ),
-      });
-    }
-    const pairs: { label: string; cells: Cell[] }[] = [];
-    for (const v of [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]) {
-      const total = v === 11 ? 12 : v * 2;
-      pairs.push({
-        label: v === 11 ? 'A,A' : `${v},${v}`,
-        cells: DEALER_UPS.map((up) =>
-          decide({ total, soft: v === 11, pairValue: v, isTwoCards: true, canSplit: true }, up),
-        ),
-      });
-    }
-    return { hard, soft, pairs };
-  }, []);
-}
-
-function StratChart({ rows, caption }: { rows: { label: string; cells: Cell[] }[]; caption: string }) {
-  return (
-    <div className="table-scroll">
-      <table className="strat-table">
-        <caption style={{ captionSide: 'bottom', fontSize: 11, color: 'var(--text-dim)', paddingTop: 6 }}>
-          {caption}
-        </caption>
-        <thead>
-          <tr>
-            <th className="rowhead">You</th>
-            {UP_LABELS.map((u) => (
-              <th key={u}>{u}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.label}>
-              <td className="rowhead">{r.label}</td>
-              {r.cells.map((c, i) => (
-                <td key={i} className={c}>
-                  {c}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function Legend() {
-  return (
-    <div className="strat-legend">
-      <span><span className="key" style={{ background: 'rgba(224,87,79,.28)' }} />H = Hit (take a card)</span>
-      <span><span className="key" style={{ background: 'rgba(76,186,119,.26)' }} />S = Stand (stop)</span>
-      <span><span className="key" style={{ background: 'rgba(88,146,227,.3)' }} />D = Double (else hit) · Ds = Double (else stand)</span>
-      <span><span className="key" style={{ background: 'rgba(217,171,74,.32)' }} />P = Split the pair</span>
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------- lessons
 
 function BlackjackLesson() {
@@ -422,6 +360,10 @@ function BlackjackLesson() {
         Why bother? Played perfectly, blackjack&#39;s <T k="house-edge">house edge</T> is about half a percent —
         the best deal in the casino. Played by feel, most people give the house 2% or more. Same table, same cards:
         the difference is entirely in the decisions.
+      </p>
+      <p>
+        Headed to a real table? Bookmark the <a href="/card">quick-reference strategy card</a> — just the charts,
+        sized for a phone screen.
       </p>
       <a className="practice-cta" href="/blackjack">Practice blackjack →</a>
     </>
@@ -632,6 +574,158 @@ function ThreeCardLesson() {
   );
 }
 
+function SlotsLesson() {
+  return (
+    <>
+      <h1>Slot Machines, Demystified</h1>
+      <p className="lede">
+        Slots are the one game in this school with no strategy chart — once you press spin there are no decisions
+        left to make, so nothing here will help you "beat" a slot machine. Nobody can. What this lesson <em>can</em>{' '}
+        do is explain how the machines actually work: the <T k="rng">RNG</T>, the different machine types, which
+        on-screen "progress" is real and which is theater, and what <T k="volatility">volatility</T> means for your
+        wallet. Armed with that, you can answer the two questions that matter: <strong>do I want to play slots at
+        all, and if so, which machines fit my budget and taste?</strong>
+      </p>
+
+      <h2>How a slot really works</h2>
+      <p>
+        Behind every modern slot is a <T k="rng">random number generator</T> producing thousands of numbers a
+        second, whether anyone is playing or not. The instant you press spin, the current number determines the
+        result; the reels then spin purely for drama. Which results are possible, and how often, is fixed by the
+        game&#39;s internal math sheet: the mix of symbols on each virtual reel married to the{' '}
+        <T k="paytable">pay table</T>. Together they set the machine&#39;s <T k="return">return (RTP)</T> — the
+        percentage of all money bet that it pays back over its lifetime.
+      </p>
+      <p>Three consequences worth internalizing, because casinos profit from people not knowing them:</p>
+      <ol>
+        <li><strong>Every spin is independent.</strong> No machine is ever hot, cold, or "due." A jackpot can hit twice in ten minutes or not for years — the RNG has no memory of either.</li>
+        <li><strong>Nothing you do changes the odds.</strong> Time of day, spin timing, bet rhythm, whether you use a player&#39;s card, whether someone just won — none of it moves the math. Changing the RTP of a real machine requires regulator-supervised paperwork, not a switch in the back office.</li>
+        <li><strong>Near misses are choreography.</strong> Two jackpot symbols and a third just off the payline feels agonizingly close. It isn&#39;t — the outcome was decided before the reels moved, and games are deliberately staged to show you almost-wins.</li>
+      </ol>
+      <p>
+        The other thing to know: unlike video poker, where the pay table tells you the exact return,{' '}
+        <strong>a slot&#39;s RTP is invisible in a live casino.</strong> Two identical-looking machines side by
+        side can be set to different returns. Typical reality: penny video slots keep roughly 8–12% of every bet,
+        higher-denomination machines usually (not always) keep less, and online slots — which commonly publish
+        RTP in their help screens — mostly run 94–97%. Compare that to the half-percent edge of studied blackjack
+        or video poker and you understand why slots fund the casino&#39;s chandeliers.
+      </p>
+
+      <h2>The types of machines</h2>
+      <p>Walk any slot floor and nearly everything fits one of a few families:</p>
+      <ol>
+        <li>
+          <strong>Classic reel slots.</strong> Three reels, one to a few paylines, a simple pay table you can read
+          in ten seconds. Fixed top prize, generally steadier behavior. One trap: many older-style machines pay a
+          disproportionate jackpot only at max coins — if you play one, the last coin is usually the best-value
+          coin.
+        </li>
+        <li>
+          <strong>Video slots with paylines.</strong> Five video reels, dozens of paylines, plus wilds, scatters,
+          free-spin rounds and bonus games. Most "wins" are partial — 40¢ back on a $1.20 spin, with fanfare.
+          Betting fewer lines rarely changes the return per dollar; it just slows the game down (not a bad thing).
+        </li>
+        <li>
+          <strong>"Ways" and cascading games.</strong> Instead of fixed lines, matching symbols on adjacent reels
+          pay in any position — often tens of thousands of ways, sometimes with a reshuffling reel layout every
+          spin. Winning symbols may vanish and let new ones drop in for chain reactions, with multipliers that grow
+          during free spins. Exciting, and usually on the high-volatility end.
+        </li>
+        <li>
+          <strong>Hold-and-respin games.</strong> Land enough trigger symbols (coins, orbs, pearls) and they lock
+          in place while the rest of the screen respins, trying to fill the grid for escalating prizes. This
+          family dominates modern floors — and it&#39;s where most of the &quot;progression&quot; theater below
+          lives.
+        </li>
+        <li>
+          <strong><T k="progressive">Progressives</T>.</strong> Part of every bet feeds a growing jackpot.{' '}
+          <em>Standalone</em> machines feed their own meter; <em>local</em> links pool one casino&#39;s machines;{' '}
+          <em>wide-area</em> networks link whole states into eight-figure prizes. The funding comes out of the
+          base game: the giant linked jackpots are generally the worst everyday return on the floor, because a
+          slice of your bet is financing a prize you almost certainly won&#39;t win. Check the fine print, too —
+          some progressives require a minimum or maximum bet to be eligible at all.
+        </li>
+      </ol>
+
+      <h2>Real progression vs. fake progression</h2>
+      <p>
+        Modern slots are covered in meters: pots filling with coins, gems collecting in a vault, firecrackers
+        climbing toward a bonus. The industry itself splits these into two categories — <em>actual persistence</em>{' '}
+        and <em>perceived persistence</em> — and the difference is worth real money.
+      </p>
+      <p>
+        <strong>Real progression (persistent state):</strong> the meter is part of the game&#39;s math and carries
+        between spins — and, crucially, between players. Collect 100 coins and a bonus genuinely triggers;
+        the count survives when a player walks away. <T k="must-hit-by">Must-hit-by progressives</T> are the
+        purest form: a printed ceiling the jackpot cannot pass. Real progression means a machine&#39;s current
+        state changes its value — which is why a small tribe of advantage players walks the floor hunting machines
+        abandoned with nearly-full meters. If a meter is real and nearly full, the previous player paid for most
+        of your bonus.
+      </p>
+      <p>
+        <strong>Fake progression (perceived persistence):</strong> the pot glows, swells and rattles — and none of
+        it changes your odds by one cent. It&#39;s animation layered over the same independent RNG, engineered to
+        make you feel a payoff building and make leaving the machine feel like abandoning an investment. It is
+        currently the dominant design on casino floors precisely because it creates that feeling for free.
+      </p>
+      <p>How to tell them apart before you care:</p>
+      <ol>
+        <li><strong>Does the state survive?</strong> Real meters show a specific persistent count ("87/100 coins") that&#39;s still there when nobody&#39;s playing. Vague glows, pulses and "energy" filling a pot are theater.</li>
+        <li><strong>Is there a printed guarantee?</strong> "Must hit by $500" is enforceable math. "Jackpot feels close!" is marketing.</li>
+        <li><strong>Read the help screens.</strong> Real mechanics are spelled out in the rules pages, because regulators require it. If the rules never mention the meter affecting anything, it doesn&#39;t.</li>
+      </ol>
+      <p>
+        One warning cuts both ways: fake progression is specifically designed to trigger sunk-cost feelings —
+        &quot;I can&#39;t leave now, it&#39;s about to pop.&quot; If you find yourself thinking that at a machine
+        whose meter isn&#39;t provably real, that&#39;s the machine playing you.
+      </p>
+
+      <h2>Low volatility vs. high volatility</h2>
+      <p>
+        Two machines can have identical returns and feel like completely different games. <T k="volatility">
+        Volatility</T> is how the payback is distributed; <T k="hit-frequency">hit frequency</T> is how often
+        anything pays at all.
+      </p>
+      <ol>
+        <li><strong>Low volatility:</strong> frequent small wins, few huge ones. Your money erodes slowly and predictably; sessions last longer; you will almost never win big. Best for modest bankrolls, long relaxed sessions, and anyone who hates dry spells.</li>
+        <li><strong>High volatility:</strong> long losing stretches punctuated by rare hits worth hundreds or thousands of bets. The only way to a genuinely big win — and the fastest way to an empty wallet. A common rule of thumb: bring 200–300 bets of bankroll if you want to survive a high-volatility machine&#39;s droughts.</li>
+      </ol>
+      <p>Casinos rarely label volatility on the floor, but you can estimate it from the glass:</p>
+      <ol>
+        <li><strong>Look at the pay table&#39;s spread.</strong> Top prize thousands of times the smallest win → high volatility. A flat table where the best prizes are modest multiples → low.</li>
+        <li><strong>Big progressive or massive advertised max win</strong> (5,000×–50,000× online) → the base game is starved to fund it: high volatility.</li>
+        <li><strong>Feature-stacked games</strong> — retriggering free spins, growing multipliers, full-screen jackpots — concentrate payback into rare events: higher volatility. Simple games with small frequent bonuses run lower.</li>
+        <li><strong>Online, just look:</strong> most published help screens state volatility and RTP outright.</li>
+      </ol>
+
+      <h2>So — should you play slots?</h2>
+      <p>
+        Do the honest math first. Slots are the most expensive game in the casino not just because the edge is
+        high but because the game is fast: a comfortable pace is 400–600 spins an hour. At $1.20 a spin and 500
+        spins an hour, you&#39;re putting $600/hour through a machine that keeps, say, 10% — an expected cost of{' '}
+        <strong>about $60 an hour</strong>. The same hour at quarter video poker with the strategy from this site
+        costs an expected $3 or so; studied blackjack similar. Variance means any single night can beat those
+        numbers badly in either direction — but that&#39;s the price tag on the sticker.
+      </p>
+      <p>If the lights and the jackpot dream are worth it to you — that&#39;s a legitimate answer! — buy the experience intelligently:</p>
+      <ol>
+        <li><strong>Decide what the session may cost before you sit down</strong>, treat it as an entertainment purchase, and never chase what the machine "owes" you. It owes you nothing; every spin is spin one.</li>
+        <li><strong>Match volatility to your goal.</strong> Want two hours of fun on $50? Low volatility, small bets. Willing to lose your whole budget fast for a real shot at a big hit? High volatility — and expect the fast loss.</li>
+        <li><strong>Skip the wide-area monsters</strong> unless the lottery-ticket dream is the whole point — you pay for that jackpot on every spin.</li>
+        <li><strong>Check bet requirements.</strong> If a machine only awards its jackpot or bonus at max bet, either bet max on a lower denomination or pick a different machine.</li>
+        <li><strong>Prefer machines that publish their numbers.</strong> Online slots disclose RTP and volatility; on a live floor, favoring simpler games and reading help screens is the closest you get.</li>
+        <li><strong>Slow down.</strong> The house edge is charged per spin. Half the spins per hour is literally half the expected cost — the cheapest upgrade in the casino.</li>
+      </ol>
+      <p>
+        And if what you actually enjoy is the machine format — sitting alone, pressing buttons, jackpot potential —
+        consider <a href="/learn/videopoker">video poker</a>: the same cabinet experience with posted math, real
+        decisions, and a house edge you can shrink to a twentieth of a slot&#39;s.
+      </p>
+      <a className="practice-cta" href="/videopoker">Try video poker — the slot that lets you fight back →</a>
+    </>
+  );
+}
+
 function LearnIndex() {
   return (
     <>
@@ -673,7 +767,10 @@ function LearnIndex() {
       <p>
         Blackjack is the classic first study — one chart covers everything. Video poker rewards it most per hour
         of study. If you like the poker pits, Ultimate Texas Hold&#39;em has the most interesting decisions, and
-        Three Card Poker takes five minutes to master, literally.
+        Three Card Poker takes five minutes to master, literally. And even though there&#39;s no strategy that
+        beats them, the <a href="/learn/slots">slots lesson</a> explains how the machines actually work — which
+        progression meters are real, what volatility costs you — so you can decide if and what to play with open
+        eyes.
       </p>
     </>
   );
@@ -716,6 +813,13 @@ const TOPICS: Record<string, { component: () => JSX.Element; title: string; desc
     description:
       'Three Card Poker for beginners: how ante, play and the dealer qualification rule work, and why Queen-6-4 is the exact line between playing and folding.',
     nav: 'Three Card',
+  },
+  slots: {
+    component: SlotsLesson,
+    title: `Slot Machines Explained — Types, Volatility, Real vs Fake Progression | ${SITE_NAME}`,
+    description:
+      'How slot machines really work: RNG myths, machine types, progressive jackpots, persistent-state vs perceived-persistence meters, and how to pick a slot that matches your risk tolerance.',
+    nav: 'Slots',
   },
   glossary: {
     component: GlossaryLesson,
