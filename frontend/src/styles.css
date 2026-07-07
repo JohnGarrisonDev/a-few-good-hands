@@ -280,8 +280,9 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .sheet-more { font-size: 13px; font-weight: 700; }
 
 .modal {
-  width: 100%;
-  max-width: min(400px, calc(100vw - 32px));
+  /* sized relative to the fixed backdrop, never the document — no 100vw scrollbar overflow */
+  width: calc(100% - 32px);
+  max-width: 400px;
   background: var(--bg-panel);
   border: 1px solid var(--border-strong);
   border-radius: 12px;
@@ -852,21 +853,16 @@ body.reduced-motion *::after {
 }
 
 @media (max-width: 680px) {
-  .topbar { padding: 8px 12px; gap: 7px; flex-wrap: nowrap; }
+  /* two rows: logo + wordmark on top; bankroll · add · hamburger right-justified below */
+  .topbar { padding: 8px 12px 10px; gap: 7px; flex-wrap: wrap; }
   .topbar nav.site-nav { display: none; }
-  /* one line, justified right: motion · bankroll · add · hamburger */
+  .topbar .anim-toggle { display: none; }
+  .brand { flex: 1 0 100%; }
+  .brand .wordmark { font-size: 19px; }
   .hamburger { display: inline-flex; order: 5; flex: 0 0 auto; }
-  .topbar .anim-toggle .label-text { display: none; }
-  .brand .wordmark small { display: none; }
-  .brand .wordmark { font-size: 17px; }
-  .bankroll-chip { padding: 4px 10px; flex: 0 0 auto; }
+  .bankroll-chip { padding: 4px 12px; flex: 0 0 auto; }
   .bankroll-chip .amount { font-size: 15px; }
-  .topbar > .btn-gold { padding: 8px 11px; font-size: 12px; flex: 0 0 auto; }
-}
-
-@media (max-width: 540px) {
-  .brand .wordmark { display: none; }
-  .bankroll-chip label { display: none; }
+  .topbar > .btn-gold { padding: 8px 12px; font-size: 12px; flex: 0 0 auto; }
 }
 
 @media (max-width: 680px) {
