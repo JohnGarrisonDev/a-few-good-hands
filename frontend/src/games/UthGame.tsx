@@ -9,6 +9,7 @@ import { FlopEV, PreflopEV, RiverEV } from '../lib/uth/ev';
 import { settleUTH } from '../lib/uth/rules';
 import { shouldRaisePreflop } from '../lib/uth/strategy';
 import { useSession } from '../store/session';
+import { Hk, useHotkeys } from '../lib/useHotkeys';
 
 const GAME = 'uth';
 const IMPLIED_EDGE = 2.185; // % of one ante, optimal strategy (Wizard of Odds)
@@ -203,6 +204,26 @@ export function UthGame() {
     setPhase('done');
   }
 
+  const canDeal = (phase === 'bet' || phase === 'done') && session.state.bankroll >= 2 * ante;
+  const betHotkey =
+    phase === 'preflop' && session.state.bankroll >= 4 * ante
+      ? () => onPreflop('raise')
+      : phase === 'flop' && session.state.bankroll >= 2 * ante
+        ? () => onFlop('raise')
+        : phase === 'river' && session.state.bankroll >= ante
+          ? () => onRiver('bet')
+          : undefined;
+  const checkHotkey =
+    phase === 'preflop' ? () => onPreflop('check') : phase === 'flop' ? () => onFlop('check') : undefined;
+  useHotkeys({
+    b: betHotkey,
+    c: checkHotkey,
+    f: phase === 'river' ? () => onRiver('fold') : undefined,
+    space: canDeal ? onDeal : undefined,
+    enter: canDeal ? onDeal : undefined,
+    d: canDeal ? onDeal : undefined,
+  });
+
   const boardVisible = phase === 'flop' ? 3 : phase === 'river' || phase === 'done' ? 5 : 0;
   const playerCat = round && phase === 'done' ? CAT_NAMES[catOf(eval7([...round.player, ...round.board]))] : null;
   const dealerCat = round && phase === 'done' ? CAT_NAMES[catOf(eval7([...round.dealer, ...round.board]))] : null;
@@ -272,7 +293,7 @@ export function UthGame() {
                 onClick={onDeal}
                 disabled={session.state.bankroll < 2 * ante}
               >
-                Deal — ${2 * ante} (ante + blind)
+                Deal — ${2 * ante} (ante + blind) <Hk k="Space" />
               </button>
             </div>
           </>
@@ -285,10 +306,10 @@ export function UthGame() {
                   onClick={() => onPreflop('raise')}
                   disabled={session.state.bankroll < 4 * ante}
                 >
-                  Bet 4× (${4 * ante})
+                  Bet 4× (${4 * ante}) <Hk k="B" />
                 </button>
                 <button className="btn-action" onClick={() => onPreflop('check')}>
-                  Check
+                  Check <Hk k="C" />
                 </button>
               </>
             )}
@@ -299,10 +320,10 @@ export function UthGame() {
                   onClick={() => onFlop('raise')}
                   disabled={session.state.bankroll < 2 * ante}
                 >
-                  Bet 2× (${2 * ante})
+                  Bet 2× (${2 * ante}) <Hk k="B" />
                 </button>
                 <button className="btn-action" onClick={() => onFlop('check')}>
-                  Check
+                  Check <Hk k="C" />
                 </button>
               </>
             )}
@@ -313,10 +334,10 @@ export function UthGame() {
                   onClick={() => onRiver('bet')}
                   disabled={session.state.bankroll < ante}
                 >
-                  Bet 1× (${ante})
+                  Bet 1× (${ante}) <Hk k="B" />
                 </button>
                 <button className="btn-action danger" onClick={() => onRiver('fold')}>
-                  Fold
+                  Fold <Hk k="F" />
                 </button>
               </>
             )}

@@ -6,6 +6,7 @@ import { FeedbackPanel, GradeDisplay, VerdictChip } from '../components/Feedback
 import { Card, freshDeck, shuffle } from '../lib/cards';
 import { anteBonus, cat3, dealerQualifies3, eval3, threeCardAnalysis } from '../lib/threecard/ev';
 import { useSession } from '../store/session';
+import { Hk, useHotkeys } from '../lib/useHotkeys';
 
 const GAME = 'threecard';
 const IMPLIED_EDGE = 3.37; // % of ante, ante+play with optimal Q-6-4 strategy
@@ -91,6 +92,15 @@ export function ThreeCardGame() {
     setPhase('done');
   }
 
+  const canDeal = phase !== 'decide' && session.state.bankroll >= ante;
+  useHotkeys({
+    p: phase === 'decide' && session.state.bankroll >= ante ? () => onDecide(true) : undefined,
+    f: phase === 'decide' ? () => onDecide(false) : undefined,
+    space: canDeal ? onDeal : undefined,
+    enter: canDeal ? onDeal : undefined,
+    d: canDeal ? onDeal : undefined,
+  });
+
   return (
     <div className="game-page">
       <div className="table-panel">
@@ -125,10 +135,10 @@ export function ThreeCardGame() {
               onClick={() => onDecide(true)}
               disabled={session.state.bankroll < ante}
             >
-              Play (${ante})
+              Play (${ante}) <Hk k="P" />
             </button>
             <button className="btn-action danger" onClick={() => onDecide(false)}>
-              Fold
+              Fold <Hk k="F" />
             </button>
           </div>
         ) : (
@@ -136,7 +146,7 @@ export function ThreeCardGame() {
             <BetControl label="Ante" value={ante} onChange={setAnte} />
             <div className="action-row">
               <button className="btn-action primary" onClick={onDeal} disabled={session.state.bankroll < ante}>
-                Deal — ${ante}
+                Deal — ${ante} <Hk k="Space" />
               </button>
             </div>
           </>

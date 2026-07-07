@@ -14,6 +14,7 @@ import {
   legalActions,
 } from '../lib/blackjack/game';
 import { useSession } from '../store/session';
+import { Hk, useHotkeys } from '../lib/useHotkeys';
 
 const GAME = 'blackjack';
 const ACTION_LABELS: Record<BJAction, string> = {
@@ -22,6 +23,7 @@ const ACTION_LABELS: Record<BJAction, string> = {
   double: 'Double',
   split: 'Split',
 };
+const ACTION_KEYS: Record<BJAction, string> = { hit: 'H', stand: 'S', double: 'D', split: 'P' };
 
 export function BlackjackGame() {
   const session = useSession();
@@ -74,6 +76,20 @@ export function BlackjackGame() {
   }
 
   const dealerT = game.dealerCards.length ? handTotal(game.dealerRevealed ? game.dealerCards : [game.dealerCards[0]]) : null;
+
+  const canAct = (a: BJAction) =>
+    inRound &&
+    actions.includes(a) &&
+    !((a === 'double' || a === 'split') && session.state.bankroll < game.hands[game.activeHand].bet);
+  const canDeal = !inRound && session.state.bankroll >= bet;
+  useHotkeys({
+    h: canAct('hit') ? () => onAction('hit') : undefined,
+    s: canAct('stand') ? () => onAction('stand') : undefined,
+    d: canAct('double') ? () => onAction('double') : canDeal ? onDeal : undefined,
+    p: canAct('split') ? () => onAction('split') : undefined,
+    space: canDeal ? onDeal : undefined,
+    enter: canDeal ? onDeal : undefined,
+  });
 
   return (
     <div className="game-page">
@@ -129,7 +145,7 @@ export function BlackjackGame() {
                 disabled={!actions.includes(a) || (a !== 'stand' && a !== 'hit' && session.state.bankroll < game.hands[game.activeHand].bet)}
                 onClick={() => onAction(a)}
               >
-                {ACTION_LABELS[a]}
+                {ACTION_LABELS[a]} <Hk k={ACTION_KEYS[a]} />
               </button>
             ))}
           </div>
@@ -138,7 +154,7 @@ export function BlackjackGame() {
             <BetControl label="Bet" value={bet} onChange={setBet} />
             <div className="action-row">
               <button className="btn-action primary" onClick={onDeal} disabled={session.state.bankroll < bet}>
-                Deal — ${bet}
+                Deal — ${bet} <Hk k="Space" />
               </button>
             </div>
           </>

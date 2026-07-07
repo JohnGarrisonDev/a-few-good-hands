@@ -7,6 +7,7 @@ import { Card, cardLabel, freshDeck, shuffle } from '../lib/cards';
 import { HoldAnalysis } from '../lib/videopoker/ev';
 import { PAYTABLES, paytableById } from '../lib/videopoker/paytables';
 import { useSession } from '../store/session';
+import { Hk, useHotkeys } from '../lib/useHotkeys';
 
 const GAME = 'videopoker';
 const HAND_COUNTS = [1, 3, 5, 10];
@@ -154,6 +155,23 @@ export function VideoPokerGame() {
 
   const wonLabels = new Set(fullyRevealed ? results.filter((r) => r.pays > 0).map((r) => r.label) : []);
 
+  const canDeal =
+    (phase === 'bet' || (phase === 'done' && fullyRevealed)) && session.state.bankroll >= totalBet;
+  const toggleHold = (i: number) =>
+    phase === 'hold' ? () => setHolds((h) => h.map((v, j) => (j === i ? !v : v))) : undefined;
+  const dealOrDraw = phase === 'hold' ? onDraw : canDeal ? onDeal : undefined;
+  useHotkeys({
+    '1': toggleHold(0),
+    '2': toggleHold(1),
+    '3': toggleHold(2),
+    '4': toggleHold(3),
+    '5': toggleHold(4),
+    space: dealOrDraw,
+    enter: dealOrDraw,
+    d: dealOrDraw,
+    b: phase === 'done' && fullyRevealed ? () => setPhase('bet') : undefined,
+  });
+
   /** one small upper row for hand index h (1..numHands-1) */
   function upperRow(h: number) {
     const isRevealed = phase === 'done' && h < revealed;
@@ -209,7 +227,7 @@ export function VideoPokerGame() {
             <BetControl label="Bet / hand" value={betPerHand} onChange={setBetPerHand} chips={[1, 5, 25]} />
             <div className="action-row">
               <button className="btn-action primary" onClick={onDeal} disabled={session.state.bankroll < totalBet}>
-                Deal — ${totalBet}
+                Deal — ${totalBet} <Hk k="Space" />
               </button>
             </div>
           </>
@@ -225,7 +243,7 @@ export function VideoPokerGame() {
 
             <div className="seat-label">
               {phase === 'hold'
-                ? 'Tap cards to hold, then draw'
+                ? 'Tap cards (or press 1–5) to hold, then draw'
                 : revealed >= 1
                   ? `${results[0].label}${results[0].pays > 0 ? ` +$${results[0].pays}` : ''}`
                   : ''}
@@ -254,7 +272,7 @@ export function VideoPokerGame() {
             <div className="action-row">
               {phase === 'hold' && (
                 <button className="btn-action primary" onClick={onDraw}>
-                  Draw
+                  Draw <Hk k="Space" />
                 </button>
               )}
               {phase === 'done' && (
@@ -263,12 +281,12 @@ export function VideoPokerGame() {
                   onClick={onDeal}
                   disabled={!fullyRevealed || session.state.bankroll < totalBet}
                 >
-                  Deal again — ${totalBet}
+                  Deal again — ${totalBet} <Hk k="Space" />
                 </button>
               )}
               {phase === 'done' && (
                 <button className="btn-action" disabled={!fullyRevealed} onClick={() => setPhase('bet')}>
-                  Change game / bet
+                  Change game / bet <Hk k="B" />
                 </button>
               )}
             </div>
