@@ -11,7 +11,13 @@
   <url><loc>https://www.afewgoodhands.com/learn/uth</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.afewgoodhands.com/learn/threecard</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.afewgoodhands.com/learn/slots</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.afewgoodhands.com/learn/bankroll</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.afewgoodhands.com/learn/paytables</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.afewgoodhands.com/learn/myths</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.afewgoodhands.com/learn/glossary</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.afewgoodhands.com/card</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.afewgoodhands.com/about</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://www.afewgoodhands.com/contact</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://www.afewgoodhands.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://www.afewgoodhands.com/legal</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>

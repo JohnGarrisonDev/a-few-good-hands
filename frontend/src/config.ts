@@ -5,6 +5,8 @@ export const SITE_TAGLINE = 'You can’t handle the truth about your play. Or ca
 export const SITE_URL = 'https://www.afewgoodhands.com';
 export const COPYRIGHT_OWNER = 'John Garrison';
 export const COPYRIGHT_YEAR = 2026;
+/** public contact address shown on /contact (required by ad networks for site trust) */
+export const CONTACT_EMAIL = 'johngarrison1996@gmail.com';
 
 /**
  * Google AdSense publisher ID. The verification script tag lives in index.html;

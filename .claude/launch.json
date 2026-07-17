@@ -8,6 +8,20 @@
       "cwd": "frontend",
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "dist-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview"],
+      "cwd": "frontend",
+      "port": 4173,
+      "autoPort": true
+    },
+    {
+      "name": "afgh-mobile-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\John\\Documents\\Sandy\\POC\\afgh-mobile", "run", "web"],
+      "port": 8081
     }
   ]
 }
