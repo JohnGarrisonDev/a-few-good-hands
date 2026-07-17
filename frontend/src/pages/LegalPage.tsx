@@ -54,35 +54,11 @@ export function LegalPage() {
       </section>
 
       <section>
-        <h2>Privacy policy</h2>
+        <h2>Privacy</h2>
         <p>
-          <strong>What we collect:</strong> nothing, directly. This site has no accounts, no sign-ups and no
-          server-side database. Your simulated bankroll and session statistics are stored only in your own
-          browser&#39;s <code>localStorage</code> and never leave your device. You can erase them at any time by
-          clearing your browser storage for this site.
-        </p>
-        <p>
-          <strong>Advertising &amp; cookies:</strong> this site may display ads served by Google AdSense.
-          Third-party vendors, including Google, use cookies (such as the advertising cookie) to serve ads based on
-          your prior visits to this or other websites. Google&#39;s use of advertising cookies enables it and its
-          partners to serve ads based on your visits to this site and/or other sites on the Internet. You may opt
-          out of personalized advertising by visiting{' '}
-          <a href="https://www.google.com/settings/ads" rel="noopener nofollow" target="_blank">
-            Google Ads Settings
-          </a>{' '}
-          or{' '}
-          <a href="https://www.aboutads.info" rel="noopener nofollow" target="_blank">
-            aboutads.info
-          </a>
-          . See{' '}
-          <a href="https://policies.google.com/technologies/partner-sites" rel="noopener nofollow" target="_blank">
-            how Google uses data from partner sites
-          </a>
-          .
-        </p>
-        <p>
-          <strong>Hosting logs:</strong> our hosting provider (Microsoft Azure) may record standard, transient
-          technical logs (IP address, user agent) to operate the service.
+          The site collects no personal information directly; play data lives only in your own browser, and ads
+          may be served by Google AdSense using cookies. The full details, including how to opt out of
+          personalized advertising, are in the dedicated <a href="/privacy">Privacy Policy</a>.
         </p>
       </section>
 

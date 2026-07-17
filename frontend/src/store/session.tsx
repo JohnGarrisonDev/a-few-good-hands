@@ -90,6 +90,8 @@ function reducer(state: SessionState, action: Action): SessionState {
 const STORAGE_KEY = 'afgh-session-v1';
 
 function load(): SessionState {
+  // build-time prerendering has no browser storage — use defaults
+  if (typeof window === 'undefined') return { bankroll: 1000, stats: {}, animations: true };
   // default animations off for users who ask the OS for reduced motion
   const prefersReduced =
     typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;

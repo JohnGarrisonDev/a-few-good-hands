@@ -726,6 +726,213 @@ function SlotsLesson() {
   );
 }
 
+function BankrollLesson() {
+  return (
+    <>
+      <h1>Bankroll &amp; Variance: The Math of Not Going Broke</h1>
+      <p className="lede">
+        Strategy tells you the right play; bankroll math tells you what a session will actually feel like — and
+        cost. This lesson puts numbers on the two forces at work every time you sit down: the{' '}
+        <T k="house-edge">house edge</T>, which grinds slowly and predictably, and <T k="variance">variance</T>,
+        which swings wildly and drowns the edge out in the short run. Understanding both is the difference between
+        a planned evening and an ugly surprise.
+      </p>
+
+      <h2>Expected cost: the honest price tag</h2>
+      <p>
+        The long-run cost of any gambling session is simple multiplication:{' '}
+        <strong>total money wagered × house edge</strong>. Not your buy-in — your total action. Bet $10 a hand at
+        70 blackjack hands an hour and you&#39;re wagering $700/hour; at a 0.6% edge that costs about $4.20 an
+        hour played perfectly. The same $10 on a slot at 500 spins an hour is $5,000/hour of action; at a 10%
+        hold that&#39;s $500 an hour. Same bet size, hundred-times different price — because edge <em>and</em>{' '}
+        speed both multiply. Slowing down is mathematically identical to finding a better game.
+      </p>
+
+      <h2>Variance: why one night proves nothing</h2>
+      <p>
+        Blackjack&#39;s standard deviation is about 1.15 bets per hand. Over 70 hands at $10, one standard
+        deviation is roughly ±$95 — against an expected loss of about $4. The swing is twenty times the grind.
+        That ratio is why people believe in hot tables and lucky rituals: in any single session, luck outweighs
+        skill enormously, and a terrible player can crush a perfect one all night. But variance grows with the{' '}
+        <em>square root</em> of hands played while expected loss grows linearly — over ten thousand hands the
+        grind catches the swing, and after a hundred thousand the math is basically destiny. The casino plays the
+        long game; a training site&#39;s job is to make sure your side of it is as cheap as possible.
+      </p>
+
+      <h2>Sizing a session bankroll</h2>
+      <p>
+        A practical rule of thumb for surviving normal swings without sweating: bring roughly{' '}
+        <strong>40–50 bets for blackjack or the poker-pit games</strong> (where each round risks a few bets at
+        once), and <strong>200–300 bets for anything high-volatility</strong> like Double Double Bonus or slots.
+        With $200 at a $10 blackjack table you have a real chance of a losing streak felling you before the
+        evening is done; the fix is not courage, it&#39;s a $5 table. Three rules turn this into a system:
+        decide the number before you play, never top up past it, and treat whatever is gone at the end as the
+        purchase price of the entertainment — because mathematically, that&#39;s exactly what it was.
+      </p>
+
+      <h2>Betting systems don&#39;t work — here&#39;s the actual math</h2>
+      <p>
+        Every betting progression — Martingale (double after losses), and all their cousins —
+        rearranges <em>when</em> you win and lose without changing the <T k="expected-value">expected value</T> of
+        a single bet, which stays negative. The Martingale turns many small wins plus rare catastrophic losses
+        into the same long-run cost: doubling $10 through a seven-loss streak has you betting $1,280 to win the
+        original $10, and seven-loss streaks arrive far more often than intuition says — about once every 90
+        sequences in an even-money game. No sequencing of negative-EV bets sums to a positive. The only levers
+        that actually move your cost are the ones this site trains: game selection, rule selection, and playing
+        each hand correctly.
+      </p>
+      <p>
+        Watch it happen live: the trainer&#39;s stats panel tracks your total wagered, expected cost and actual
+        result separately — a few hundred hands of watching those numbers diverge and reconverge teaches variance
+        better than any formula.
+      </p>
+      <a className="practice-cta" href="/blackjack">Put it into practice →</a>
+    </>
+  );
+}
+
+function PaytablesLesson() {
+  return (
+    <>
+      <h1>Reading Pay Tables: The Easiest Money in the Casino</h1>
+      <p className="lede">
+        Two identical-looking machines, side by side, same game, same bets — one quietly keeps two or three times
+        as much of your money. The only difference is the <T k="paytable">pay table</T> posted on the glass, and
+        casinos count on almost nobody reading it. Five minutes of learning what the numbers mean is worth more
+        per hour than memorizing any strategy chart on this site.
+      </p>
+
+      <h2>Video poker: the two numbers that matter</h2>
+      <p>
+        Video poker pay tables are named by the full house and flush payouts, the two lines casinos shave first.
+        For Jacks or Better, per coin: <strong>9/6 returns 99.54%</strong> with perfect play,{' '}
+        <strong>8/6 returns 98.39%</strong>, <strong>8/5 returns 97.30%</strong>, and the sadly common{' '}
+        <strong>7/5 returns 96.15%</strong>. Read that as an hourly price: at $1.25 a hand and 600 hands an hour,
+        the 9/6 machine costs about $3.50/hour and the 7/5 machine about $29/hour — for exactly the same game
+        played exactly the same way. Bonus-style games advertise bigger four-of-a-kind payouts, but the funding
+        always comes from somewhere: Double Double Bonus pays two pair 1× instead of 2×, and that single line is
+        most of why its <T k="return">return</T> is a point lower than it looks.
+      </p>
+
+      <h2>Max coins and the royal flush</h2>
+      <p>
+        One machine quirk matters enough to state as a rule: the <T k="royal-flush">royal flush</T> typically
+        pays 250-per-coin at one to four coins but <strong>800-per-coin at five</strong>. Playing four coins
+        forfeits about half a percent of return. Either play max coins on a denomination you can afford — five
+        quarters beats one dollar-and-a-quarter on a dollar machine — or accept that you&#39;re paying extra for
+        smaller swings.
+      </p>
+
+      <h2>Blackjack: the sign is a pay table too</h2>
+      <p>
+        The felt and the placard are blackjack&#39;s pay table, and one line towers over the rest:{' '}
+        <strong>blackjack pays 3:2</strong> is a normal game, while <strong>6:5 adds about 1.4%</strong> to the
+        house edge — more than tripling the cost of a well-played 6-deck game. No strategy adjustment can buy
+        that back; the only correct response to a 6:5 table is to keep walking. The smaller print matters too:
+        dealer hitting soft 17 costs about 0.2%, no double after split about 0.1%, and each rule is posted right
+        there for anyone who looks. Two tables in the same pit routinely differ by half a percent — a 5x difference in the cost of your evening.
+      </p>
+
+      <h2>Side bets: where the edge hides</h2>
+      <p>
+        Almost every table game now sells side bets — Pair Plus, 21+3, Perfect Pairs, Trips — and they follow one
+        iron rule: <strong>the flashier the payout column, the bigger the house edge</strong>. Typical side bets
+        keep 2–8% (some far more), against 0.5% for the main game played well. They exist precisely because the
+        main games have become such thin margins for the house. Budget them as entertainment if you enjoy them —
+        but know that the casino considers them the profitable part of your visit.
+      </p>
+
+      <h2>The habit</h2>
+      <p>
+        Before money goes in anything: find the full house and flush numbers (or the blackjack payout line), and
+        walk one machine further if they&#39;re short. Nothing else in gambling pays this well per second of
+        effort. Then make sure your play is worthy of the good table you found — the{' '}
+        <a href="/learn/videopoker">video poker</a> and <a href="/learn/blackjack">blackjack</a> lessons take it
+        from here.
+      </p>
+      <a className="practice-cta" href="/videopoker">Practice on a full-pay machine →</a>
+    </>
+  );
+}
+
+function MythsLesson() {
+  return (
+    <>
+      <h1>Casino Myths vs. the Math</h1>
+      <p className="lede">
+        Every myth below survives because it <em>feels</em> true at a table, and because on any given night it can
+        look true. The math says otherwise — checkably, in every case. This is the Strategy School&#39;s
+        mythbusting reference: the beliefs that cost players the most, and exactly why each one is wrong.
+      </p>
+
+      <h2>&quot;The table/machine is due&quot;</h2>
+      <p>
+        The gambler&#39;s fallacy, and the most expensive sentence in gambling. Cards, dice and{' '}
+        <T k="rng">RNGs</T> have no memory: after five losses, the sixth bet has exactly the odds it always had.
+        Nothing is ever &quot;due,&quot; &quot;hot,&quot; or &quot;cold&quot; — streaks are what randomness looks
+        like, not a signal inside it. The casino version of this myth runs both directions, and both are wrong
+        for the same reason: independence.
+      </p>
+
+      <h2>&quot;Other players&#39; mistakes hurt me&quot;</h2>
+      <p>
+        The third-baseman who hits 16 against a 6 and &quot;takes the dealer&#39;s bust card&quot; is blackjack&#39;s
+        favorite villain — and mathematically a ghost. An unknown card leaving the shoe is exactly as likely to
+        help you as hurt you; over time, other players&#39; decisions have precisely zero effect on your{' '}
+        <T k="expected-value">expected value</T>. The memorable nights when a bad play cost you a hand are real;
+        the equally frequent nights it saved you just don&#39;t get remembered.
+      </p>
+
+      <h2>&quot;Insurance protects your good hands&quot;</h2>
+      <p>
+        Blackjack insurance is a separate side bet that the dealer&#39;s hole card is a ten — it pays 2:1 on a bet
+        that wins less than one time in three, for a house edge around 7%. It doesn&#39;t &quot;protect&quot;
+        anything; it&#39;s an unrelated bad bet stapled onto your good hand. &quot;Even money&quot; on your own
+        blackjack is the same bet wearing a suit. Basic strategy&#39;s answer is one word: never.
+      </p>
+
+      <h2>&quot;Betting systems beat the house&quot;</h2>
+      <p>
+        No arrangement of negative-EV bets adds up to a positive — a progression can only reshape <em>when</em>{' '}
+        the money moves, not <em>which way</em> it flows on average. The Martingale&#39;s occasional
+        table-limit catastrophe pays for all its little wins, to the decimal. The full arithmetic is in the{' '}
+        <a href="/learn/bankroll">bankroll lesson</a>. If a system truly worked, the casino wouldn&#39;t ban it —
+        it would be the one dealing it.
+      </p>
+
+      <h2>&quot;Slots pay more at night / with a player&#39;s card out / after a jackpot&quot;</h2>
+      <p>
+        A slot&#39;s return is fixed in its math sheet and can&#39;t legally change spin to spin, card in or card
+        out, midnight or noon. Changing a machine&#39;s programmed return involves regulator paperwork, not a
+        switch in the back office. And a jackpot that just hit leaves the next spin&#39;s odds exactly where they
+        were — <T k="progressive">progressive</T> meters aside, a machine that just paid is neither safer nor
+        &quot;spent.&quot; The one honest exception is a <T k="must-hit-by">must-hit-by</T> progressive near its
+        ceiling — covered in the <a href="/learn/slots">slots lesson</a>.
+      </p>
+
+      <h2>&quot;Card counting is illegal / counting is for geniuses / counting works online&quot;</h2>
+      <p>
+        Three myths in one. Counting cards with your own brain is legal everywhere in the US (casinos may still
+        ask you to leave — private property). It isn&#39;t genius work either: keeping a running plus-minus count
+        is a skill an attentive person can learn in a weekend, though disguising it well enough to survive is the
+        hard part. And it cannot work online or on any continuously-shuffled game: counting exploits a shoe that
+        deals deep without reshuffling, and a shuffle after every hand — physical or virtual — resets the count
+        to zero permanently.
+      </p>
+
+      <h2>&quot;I have a feeling about this one&quot;</h2>
+      <p>
+        Every myth above is the same belief in different clothes: that attention, timing, or ritual can move
+        odds that are fixed by arithmetic. The liberating flip side is that the arithmetic <em>is</em> movable —
+        by game selection, by <a href="/learn/paytables">pay-table reading</a>, and by playing each hand
+        correctly. Those are the only levers that exist. The good news: they&#39;re entirely learnable, and
+        they&#39;re what the rest of this site is for.
+      </p>
+      <a className="practice-cta" href="/learn">Back to the Strategy School →</a>
+    </>
+  );
+}
+
 function LearnIndex() {
   return (
     <>
@@ -772,13 +979,19 @@ function LearnIndex() {
         progression meters are real, what volatility costs you — so you can decide if and what to play with open
         eyes.
       </p>
+      <p>
+        Beyond the games themselves, three lessons cover the money side: <a href="/learn/bankroll">bankroll and
+        variance math</a> (what a session really costs and why betting systems fail),{' '}
+        <a href="/learn/paytables">reading pay tables</a> (the five-minute skill that saves more than any chart),
+        and the <a href="/learn/myths">casino myths</a> that quietly pay for the chandeliers.
+      </p>
     </>
   );
 }
 
 // ---------------------------------------------------------------- page
 
-const TOPICS: Record<string, { component: () => JSX.Element; title: string; description: string; nav: string }> = {
+export const TOPICS: Record<string, { component: () => JSX.Element; title: string; description: string; nav: string }> = {
   '': {
     component: LearnIndex,
     title: `Casino Strategy School — Learn Perfect Play | ${SITE_NAME}`,
@@ -820,6 +1033,27 @@ const TOPICS: Record<string, { component: () => JSX.Element; title: string; desc
     description:
       'How slot machines really work: RNG myths, machine types, progressive jackpots, persistent-state vs perceived-persistence meters, and how to pick a slot that matches your risk tolerance.',
     nav: 'Slots',
+  },
+  bankroll: {
+    component: BankrollLesson,
+    title: `Bankroll & Variance Math — Session Cost, Swings, Betting Systems | ${SITE_NAME}`,
+    description:
+      'How much a casino session really costs: expected loss vs variance, how to size a bankroll for blackjack, video poker and slots, and the exact math of why betting systems like the Martingale fail.',
+    nav: 'Bankroll',
+  },
+  paytables: {
+    component: PaytablesLesson,
+    title: `How to Read Casino Pay Tables — 9/6 vs 8/5, 3:2 vs 6:5 | ${SITE_NAME}`,
+    description:
+      'The five-minute skill that beats any strategy chart: reading video poker pay tables (9/6 vs 8/5 Jacks or Better), spotting 6:5 blackjack, max-coin royal payouts and why side bets are the house\'s best friend.',
+    nav: 'Pay Tables',
+  },
+  myths: {
+    component: MythsLesson,
+    title: `Casino Myths vs. the Math — Due Machines, Systems, Insurance | ${SITE_NAME}`,
+    description:
+      'The most expensive casino myths, debunked with real math: the gambler\'s fallacy, third-base blame, blackjack insurance, betting systems, slot timing myths and the truth about card counting.',
+    nav: 'Myths',
   },
   glossary: {
     component: GlossaryLesson,

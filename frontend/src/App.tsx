@@ -11,8 +11,16 @@ import { LegalPage } from './pages/LegalPage';
 import { StrategyCardPage } from './pages/StrategyCardPage';
 import { SessionProvider, useSession } from './store/session';
 import { COPYRIGHT_OWNER, COPYRIGHT_YEAR, SITE_NAME } from './config';
+import { STATIC_META } from './seoMeta';
+import { GameArticle } from './content/GameArticles';
+import { AboutPage } from './pages/AboutPage';
+import { ContactPage } from './pages/ContactPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 
-const GAMES = [
+/** true during build-time prerendering (react-dom/server) — interactive game tables are client-only */
+const IS_SSR = typeof window === 'undefined';
+
+export const GAMES = [
   {
     path: 'blackjack',
     icon: <IconBlackjack />,
@@ -60,11 +68,12 @@ const GAMES = [
 ];
 
 function currentPath(): string {
+  if (IS_SSR) return '';
   return window.location.pathname.replace(/^\/+|\/+$/g, '');
 }
 
-function usePathRoute(): string {
-  const [route, setRoute] = useState(currentPath);
+function usePathRoute(ssrPath?: string): string {
+  const [route, setRoute] = useState(() => (ssrPath !== undefined ? ssrPath : currentPath()));
   useEffect(() => {
     const onPop = () => setRoute(currentPath());
     window.addEventListener('popstate', onPop);
@@ -317,11 +326,14 @@ function Lobby() {
   );
 }
 
-function Shell() {
-  const route = usePathRoute();
+function Shell({ ssrPath }: { ssrPath?: string }) {
+  const route = usePathRoute(ssrPath);
   const session = useSession();
   const game = GAMES.find((g) => g.path === route);
   const isLegal = route === 'legal';
+  const isAbout = route === 'about';
+  const isContact = route === 'contact';
+  const isPrivacy = route === 'privacy';
   const isCard = route === 'card' || route === 'blackjack/card';
   const isLearn = route === 'learn' || route.startsWith('learn/');
   const learnTopic = route.startsWith('learn/') ? route.slice(6) : '';
@@ -331,12 +343,17 @@ function Shell() {
   }, [session.state.animations]);
 
   useEffect(() => {
+    const staticMeta = STATIC_META.get(route);
     if (game) {
       document.title = `${game.seoTitle} | ${SITE_NAME}`;
       const meta = document.querySelector('meta[name="description"]');
       if (meta) meta.setAttribute('content', game.description);
+    } else if (route && staticMeta) {
+      document.title = staticMeta.title;
+      const meta = document.querySelector('meta[name="description"]');
+      if (meta) meta.setAttribute('content', staticMeta.description);
     }
-  }, [game]);
+  }, [game, route]);
 
   // the strategy card is chrome-free on purpose: fast to load, nothing but charts
   if (isCard) return <StrategyCardPage />;
@@ -351,22 +368,30 @@ function Shell() {
             {game.path === 'blackjack' && <a href="/card">Strategy card →</a>}
             <a href={`/learn/${game.path}`}>Study this game&#39;s strategy →</a>
           </div>
-          <game.component />
+          {!IS_SSR && <game.component />}
           <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px', width: '100%' }}>
             <AdSlot placement="sidebar" />
+            <GameArticle game={game.path} />
           </div>
         </>
       ) : isLearn ? (
         <LearnPage topic={learnTopic} />
       ) : isLegal ? (
         <LegalPage />
+      ) : isAbout ? (
+        <AboutPage />
+      ) : isContact ? (
+        <ContactPage />
+      ) : isPrivacy ? (
+        <PrivacyPage />
       ) : (
         <Lobby />
       )}
       <footer className="credits">
         <div>
           © {COPYRIGHT_YEAR} {COPYRIGHT_OWNER}. All rights reserved. · <a href="/learn">Strategy School</a> ·{' '}
-          <a href="/legal">Legal, Privacy &amp; Disclaimers</a>
+          <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> ·{' '}
+          <a href="/legal">Legal &amp; Disclaimers</a>
         </div>
         <div className="fine-print">
           Free educational strategy trainer. Play money only — no real-money gambling, no prizes of any value. For
@@ -379,10 +404,10 @@ function Shell() {
   );
 }
 
-export default function App() {
+export default function App({ ssrPath }: { ssrPath?: string }) {
   return (
     <SessionProvider>
-      <Shell />
+      <Shell ssrPath={ssrPath} />
     </SessionProvider>
   );
 }
