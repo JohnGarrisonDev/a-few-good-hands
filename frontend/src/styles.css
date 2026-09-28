@@ -655,6 +655,17 @@ select {
 .learn-page li { margin-bottom: 5px; }
 .learn-page strong { color: var(--text); }
 .learn-page ol { padding-left: 22px; }
+/* inline-SVG lesson figures */
+.lesson-fig {
+  margin: 22px 0 26px;
+  padding: 18px 18px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 720px;
+}
+.lesson-fig svg { display: block; width: 100%; height: auto; font-family: var(--font-body); }
+.lesson-fig figcaption { margin-top: 10px; font-size: 12.5px; line-height: 1.6; color: var(--text-dim); font-style: italic; }
 .learn-nav { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 6px; }
 .learn-nav a {
   border: 1px solid var(--border-strong);

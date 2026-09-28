@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { Legend, StratChart, useBlackjackCharts } from '../components/BlackjackCharts';
+import { BlackjackPayoutFigure, PaytableBarsFigure, VarianceFigure } from '../components/LessonFigures';
 import { SITE_NAME } from '../config';
 
 // ---------------------------------------------------------------- glossary
@@ -758,6 +759,7 @@ function BankrollLesson() {
         grind catches the swing, and after a hundred thousand the math is basically destiny. The casino plays the
         long game; a training site&#39;s job is to make sure your side of it is as cheap as possible.
       </p>
+      <VarianceFigure />
 
       <h2>Sizing a session bankroll</h2>
       <p>
@@ -813,6 +815,7 @@ function PaytablesLesson() {
         always comes from somewhere: Double Double Bonus pays two pair 1× instead of 2×, and that single line is
         most of why its <T k="return">return</T> is a point lower than it looks.
       </p>
+      <PaytableBarsFigure />
 
       <h2>Max coins and the royal flush</h2>
       <p>
@@ -832,6 +835,7 @@ function PaytablesLesson() {
         dealer hitting soft 17 costs about 0.2%, no double after split about 0.1%, and each rule is posted right
         there for anyone who looks. Two tables in the same pit routinely differ by half a percent — a 5x difference in the cost of your evening.
       </p>
+      <BlackjackPayoutFigure />
 
       <h2>Side bets: where the edge hides</h2>
       <p>
