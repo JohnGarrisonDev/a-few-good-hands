@@ -53,22 +53,22 @@ export function VarianceFigure() {
   return (
     <figure className="lesson-fig">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Four simulated blackjack sessions of 500 hands swing between plus and minus several hundred dollars while the expected loss line drifts down only about thirty dollars.">
-        <text x={M.l} y={M.t - 2} fontSize="11" fill="var(--text-dim)">$ won / lost — four simulated sessions, $10 hands, perfect play</text>
+        <text x={M.l} y={M.t - 2} fontSize="15" fill="var(--text-dim)">$ won / lost — four simulated sessions, $10 hands, perfect play</text>
         {[-400, -200, 0, 200, 400].map((v) => (
           <g key={v}>
             <line x1={M.l} x2={W - M.r} y1={y(v)} y2={y(v)} stroke={v === 0 ? 'var(--border-strong)' : 'var(--border)'} strokeWidth="1" />
-            <text x={M.l - 8} y={y(v) + 4} fontSize="11" fill="var(--text-dim)" textAnchor="end">{v > 0 ? `+${v}` : v}</text>
+            <text x={M.l - 8} y={y(v) + 4} fontSize="15" fill="var(--text-dim)" textAnchor="end">{v > 0 ? `+${v}` : v}</text>
           </g>
         ))}
         {[0, 100, 200, 300, 400, 500].map((h) => (
-          <text key={h} x={x(h / STEP)} y={H - M.b + 16} fontSize="11" fill="var(--text-dim)" textAnchor="middle">{h}</text>
+          <text key={h} x={x(h / STEP)} y={H - M.b + 16} fontSize="15" fill="var(--text-dim)" textAnchor="middle">{h}</text>
         ))}
-        <text x={(M.l + W - M.r) / 2} y={H - 4} fontSize="11" fill="var(--text-dim)" textAnchor="middle">hands played</text>
+        <text x={(M.l + W - M.r) / 2} y={H - 4} fontSize="15" fill="var(--text-dim)" textAnchor="middle">hands played</text>
         {PATHS.map((p, i) => (
           <path key={i} d={line(p)} fill="none" stroke="var(--text-dim)" strokeWidth="1.4" opacity={0.55 + i * 0.08} />
         ))}
         <path d={`M${x(0)} ${y(0)} L${x(HANDS / STEP)} ${y(HANDS * EV_PER_HAND)}`} fill="none" stroke="var(--gold)" strokeWidth="2.4" strokeDasharray="7 5" />
-        <text x={x(HANDS / STEP) - 6} y={y(HANDS * EV_PER_HAND) + 18} fontSize="12" fill="var(--gold)" textAnchor="end">expected loss: −$30</text>
+        <text x={x(HANDS / STEP) - 6} y={y(HANDS * EV_PER_HAND) + 18} fontSize="16" fill="var(--gold)" textAnchor="end">expected loss: −$30</text>
       </svg>
       <figcaption>
         Four simulated 500-hand blackjack sessions (perfect play, $10 bets). Any single session is dominated by
@@ -97,16 +97,16 @@ export function PaytableBarsFigure() {
   return (
     <figure className="lesson-fig">
       <svg viewBox={`0 0 ${bw} ${top + JOB_TABLES.length * rowH + 10}`} role="img" aria-label="Jacks or Better returns by pay table: 9/6 pays 99.54 percent costing about 3 dollars 45 an hour; 7/5 pays 96.15 percent costing about 29 dollars an hour.">
-        <text x={labelW} y={14} fontSize="11" fill="var(--text-dim)">Jacks or Better return with perfect play — and what the house keeps per hour ($1.25 bets, 600 hands/hr)</text>
+        <text x={labelW} y={14} fontSize="15" fill="var(--text-dim)">Jacks or Better return with perfect play — and what the house keeps per hour ($1.25 bets, 600 hands/hr)</text>
         {JOB_TABLES.map((t, i) => {
           const yPos = top + i * rowH;
           const w = scaleX(t.ret) - labelW;
           const best = i === 0;
           return (
             <g key={t.name}>
-              <text x={labelW - 8} y={yPos + 21} fontSize="14" fill="var(--text)" textAnchor="end" fontWeight="700">{t.name}</text>
+              <text x={labelW - 8} y={yPos + 21} fontSize="18" fill="var(--text)" textAnchor="end" fontWeight="700">{t.name}</text>
               <rect x={labelW} y={yPos + 6} width={w} height={22} rx="3" fill={best ? 'var(--gold)' : 'var(--border-strong)'} />
-              <text x={labelW + w + 8} y={yPos + 22} fontSize="13" fill={best ? 'var(--gold)' : 'var(--text-dim)'}>
+              <text x={labelW + w + 8} y={yPos + 22} fontSize="17" fill={best ? 'var(--gold)' : 'var(--text-dim)'}>
                 {t.ret.toFixed(2)}% · ~${t.cost.toFixed(2)}/hr
               </text>
             </g>
@@ -134,15 +134,15 @@ export function BlackjackPayoutFigure() {
   return (
     <figure className="lesson-fig">
       <svg viewBox={`0 0 ${bw} 130`} role="img" aria-label="House edge comparison: blackjack paying 3 to 2 has about a 0.6 percent edge costing 4 dollars an hour; 6 to 5 has about 2 percent costing 14 dollars an hour.">
-        <text x={labelW} y={14} fontSize="11" fill="var(--text-dim)">House edge by blackjack payout — cost per hour at $10 bets, 70 hands/hr, perfect play</text>
+        <text x={labelW} y={14} fontSize="15" fill="var(--text-dim)">House edge by blackjack payout — cost per hour at $10 bets, 70 hands/hr, perfect play</text>
         {rows.map((r, i) => {
           const yPos = 26 + i * 44;
           const w = scaleX(r.edge);
           return (
             <g key={r.name}>
-              <text x={labelW - 8} y={yPos + 21} fontSize="14" fill="var(--text)" textAnchor="end" fontWeight="700">{r.name}</text>
+              <text x={labelW - 8} y={yPos + 21} fontSize="18" fill="var(--text)" textAnchor="end" fontWeight="700">{r.name}</text>
               <rect x={labelW} y={yPos + 6} width={w} height={22} rx="3" fill={r.good ? 'var(--gold)' : 'var(--red)'} />
-              <text x={labelW + w + 8} y={yPos + 22} fontSize="13" fill={r.good ? 'var(--gold)' : 'var(--red)'}>
+              <text x={labelW + w + 8} y={yPos + 22} fontSize="17" fill={r.good ? 'var(--gold)' : 'var(--red)'}>
                 {r.edge.toFixed(1)}% edge · ~${r.cost.toFixed(2)}/hr
               </text>
             </g>

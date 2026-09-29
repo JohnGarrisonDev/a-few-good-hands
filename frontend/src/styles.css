@@ -664,7 +664,8 @@ select {
   border-radius: var(--radius);
   max-width: 720px;
 }
-.lesson-fig svg { display: block; width: 100%; height: auto; font-family: var(--font-body); }
+.lesson-fig { overflow-x: auto; }
+.lesson-fig svg { display: block; width: 100%; min-width: 520px; height: auto; font-family: var(--font-body); }
 .lesson-fig figcaption { margin-top: 10px; font-size: 12.5px; line-height: 1.6; color: var(--text-dim); font-style: italic; }
 .learn-nav { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 6px; }
 .learn-nav a {

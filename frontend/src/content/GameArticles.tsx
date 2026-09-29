@@ -18,12 +18,14 @@ function BlackjackArticle() {
       <h2>What this trainer grades, exactly</h2>
       <p>
         Every time you act, the trainer computes the expected value of all of your legal options — hit, stand,
-        double, split — using a full recursive expected-value engine for a 6-deck game where the dealer stands on
-        soft 17 and doubling after splits is allowed. It doesn&#39;t compare you to a memorized chart; it solves
-        your exact hand against the dealer&#39;s upcard. If you picked anything other than the highest-EV option,
-        the feedback panel shows both plays and the difference in dollars at your bet size. Over a session, those
-        differences accumulate into your <em>actual</em> house edge, shown next to the theoretical 0.6% that
-        perfect play achieves under these rules.
+        double, split — using a full recursive expected-value engine under shoe-game rules: the dealer stands on
+        soft 17, doubling after splits is allowed, blackjack pays 3:2. The engine is an infinite-deck model (card
+        probabilities don&#39;t shift as cards leave the shoe), which agrees with published six-deck basic
+        strategy in every cell except two hair-thin soft doubles and puts perfect play at about a 0.6% house
+        edge. It doesn&#39;t compare you to a memorized chart; it solves your exact hand against the
+        dealer&#39;s upcard. If you picked anything other than the highest-EV option, the feedback panel shows
+        both plays and the difference in dollars at your bet size. Over a session, those differences accumulate
+        into your <em>actual</em> house edge, shown next to the theoretical figure for perfect play.
       </p>
       <h2>Why basic strategy is worth learning</h2>
       <p>
@@ -115,9 +117,9 @@ function UthArticle() {
         Preflop decisions are graded against the published optimal 4× raising range. Flop and river decisions are
         graded by direct enumeration: on the river the trainer plays your hand against all 990 possible dealer
         hole-card combinations and computes the exact value of betting 1× versus folding; on the flop it
-        enumerates dealer hands and runouts the same way. When you check a hand that should have bet 4×, the
-        feedback shows precisely how much expected value that timidity cost — usually far more than players
-        expect.
+        enumerates dealer hands and runouts the same way. Preflop, the exact solution is out of reach in a
+        browser, so the feedback prices a check-instead-of-4× against a 2,500-deal Monte Carlo estimate — good
+        to a few cents on a $10 ante, and usually far more than players expect.
       </p>
       <h2>The one idea that defines the game</h2>
       <p>

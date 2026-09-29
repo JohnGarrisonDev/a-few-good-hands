@@ -4,7 +4,7 @@
 
 **A Few Good Hands** (formerly *Basic Instinct*) is a free casino table-game **strategy trainer**. Play the games where your decisions actually move the house edge — blackjack, Ultimate Texas Hold'em, video poker, Three Card Poker — and get every single decision graded against the real math. No real money, ever.
 
-🌐 Live: **https://afewgoodhands.com** (Azure Static Web Apps)
+🌐 Live: **https://www.afewgoodhands.com** (Azure Static Web Apps)
 
 ## What it does
 
@@ -31,16 +31,20 @@ cd frontend
 npm install
 npm run dev      # dev server (respects PORT / --port)
 npm test         # unit tests: strategy charts, evaluators, settlement rules
-npm run build    # production build (dist/)
+npm run build    # production build: client bundle → SSR bundle → prerender every route into dist/
 ```
 
 React 18 + Vite 5 + TypeScript. No backend — all EV math runs client-side, with the heavy enumeration in web workers.
 
+`npm run build` prerenders **every route to its own static `index.html`** (title, meta, canonical, Open Graph, per-route JSON-LD and the full rendered content) via `src/entry-server.tsx` + `scripts/prerender.mjs`, and writes `sitemap.xml` from the same route list. The interactive game tables are client-only; everything else — lessons, articles, trust pages — is in the HTML before any JavaScript runs.
+
+Brand assets (favicons, `og-image.png`) are generated from the logo artwork by `node scripts/generate-assets.mjs`; outputs are committed under `public/`.
+
 ## Hosting & monetization
 
-- **Hosting:** Azure Static Web Apps (Free tier). `frontend/public/staticwebapp.config.json` provides the SPA fallback for the path-based routes. Deploy: `npm run build` then `npx @azure/static-web-apps-cli deploy ./dist --deployment-token <token> --env production`.
-- **AdSense:** ad units are wired but dormant. To enable after account approval: set `ADSENSE_CLIENT` and the slot ids in `frontend/src/config.ts`, uncomment/update the publisher line in `frontend/public/ads.txt`, rebuild, redeploy.
-- **SEO:** per-route titles/descriptions, Open Graph, JSON-LD, `robots.txt`, `sitemap.xml`.
+- **Hosting:** Azure Static Web Apps (Free tier), canonical host `www.afewgoodhands.com` (the apex 301s to www at the Cloudflare edge). `frontend/public/staticwebapp.config.json` provides the SPA fallback for any route that isn't prerendered. **Deploys are automatic**: `.github/workflows/deploy.yml` builds, tests and deploys on every push to `main` (and runs build + tests as a check on pull requests). It needs the `AZURE_STATIC_WEB_APPS_API_TOKEN` repo secret. Manual fallback: `npm run build` then `npx @azure/static-web-apps-cli deploy ./dist --deployment-token <token> --env production`.
+- **AdSense:** ad units are wired but dormant. To enable after account approval: set the slot ids in `frontend/src/config.ts` (`ADSENSE_CLIENT` is already set), rebuild, redeploy. `public/ads.txt` is live.
+- **SEO:** prerendered HTML per route, unique titles/descriptions/canonicals, Open Graph + Twitter cards with `og-image.png`, per-route schema.org JSON-LD (`Article` for lessons/articles, `FAQPage` for the FAQ, `WebApplication` for the games, breadcrumbs), author bylines with published/updated dates, generated `sitemap.xml` with `lastmod`, `robots.txt`.
 
 ## Legal posture (see `/legal` in the app)
 
@@ -52,13 +56,20 @@ React 18 + Vite 5 + TypeScript. No backend — all EV math runs client-side, wit
 
 ```
 frontend/src/
-  config.ts             site name/URL, AdSense IDs
+  config.ts             site name/URL, contact email, AdSense IDs
+  seoMeta.ts            titles/descriptions for the static pages
+  seo/jsonLd.ts         schema.org node builders (Organization, Person, Article, FAQPage, …)
+  entry-server.tsx      SSR entry + route manifest used by the prerenderer
   lib/                  card model, evaluators, per-game EV engines (+ workers)
   games/                one component per game
-  components/           cards, edge panel, decision feedback, bet controls, ad slot
-  pages/LegalPage.tsx   terms, privacy, trademark & gambling disclaimers
+  components/           cards, edge panel, feedback, bet controls, ad slot, byline, lesson figures
+  content/glossary.tsx  glossary data + the inline <T> term component
+  content/articles/     standalone Strategy School articles (/learn/<slug>) + registry
+  content/GameArticles  long-form prose under each game table
+  pages/                Strategy School lessons, about/contact/privacy/legal, strategy card
   store/                bankroll + per-game session stats
-frontend/public/        robots.txt, sitemap.xml, ads.txt, staticwebapp.config.json
+frontend/scripts/       prerender.mjs (build step), generate-assets.mjs (favicons + og:image)
+frontend/public/        robots.txt, ads.txt, favicons, og-image.png, staticwebapp.config.json
 ```
 
 ## License

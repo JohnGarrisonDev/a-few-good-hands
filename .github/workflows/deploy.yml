@@ -1,13 +1,16 @@
-name: Deploy to Azure Static Web Apps
+name: Build, test and deploy
 
 on:
   push:
     branches: [main, canonical-www]
     paths: [frontend/**, .github/workflows/deploy.yml]
+  pull_request:
+    branches: [main, canonical-www]
+    paths: [frontend/**, .github/workflows/deploy.yml]
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,10 +33,35 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Check prerender output
+        working-directory: frontend
+        run: |
+          test -f dist/index.html
+          test -f dist/sitemap.xml
+          test -f dist/learn/articles/index.html
+          grep -q 'application/ld+json' dist/learn/bankroll/index.html
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          name: dist
+          path: frontend/dist
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
       - name: Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: upload
-          app_location: frontend/dist
+          app_location: dist
           skip_app_build: true

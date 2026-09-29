@@ -41,7 +41,7 @@ export const GLOSSARY: GlossaryEntry[] = [
     key: 'variance',
     term: 'Variance',
     short: 'The natural short-term swings between what you "should" win and what actually happens.',
-    long: 'Even perfect play loses sometimes — variance is the statistical name for those swings. Doubling an 11 against a 6 is right every time, and it still loses 4 hands in 10. Don\'t judge a decision by one result; judge it by the math. Variance is why casinos need you to play a long time, and why one lucky night proves nothing.',
+    long: 'Even perfect play loses sometimes — variance is the statistical name for those swings. Doubling an 11 against a 6 is right every time, and it still loses three hands in ten. Don\'t judge a decision by one result; judge it by the math. Variance is why casinos need you to play a long time, and why one lucky night proves nothing.',
   },
   {
     key: 'bankroll',
