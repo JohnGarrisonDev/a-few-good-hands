@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { actionEVs, bestAction, HandState } from '../lib/blackjack/ev';
 
-// Basic strategy charts generated live from the EV engine (6 decks, S17, DAS)
-// so the Strategy School and the quick-reference card always match the trainer.
+// Basic strategy charts generated live from the EV engine (infinite-deck model;
+// S17, DAS, 3:2) so the Strategy School and the quick-reference card always
+// match the trainer. Versus the published 6-deck chart only A,2 vs 5 and
+// A,4 vs 4 differ (hit here, double there) — both within 0.01 bet.
 
 const DEALER_UPS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 export const UP_LABELS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'A'];

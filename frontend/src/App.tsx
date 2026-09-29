@@ -27,8 +27,8 @@ export const GAMES = [
     title: 'Blackjack',
     seoTitle: 'Blackjack Basic Strategy Trainer — Free, Every Decision Graded',
     description:
-      'Practice blackjack basic strategy free: hit, stand, double and split decisions graded against exact expected values for 6-deck S17 DAS rules.',
-    rules: '6 decks · S17 · DAS · 3:2 — hit, stand, double and split your way to perfect basic strategy.',
+      'Practice blackjack basic strategy free: hit, stand, double and split decisions graded against expected values for shoe-game rules (S17, DAS, 3:2).',
+    rules: 'Shoe game · S17 · DAS · 3:2 — hit, stand, double and split your way to perfect basic strategy.',
     edge: () => `${(houseEdge() * 100).toFixed(2)}% edge at perfect play`,
     component: BlackjackGame,
   },
@@ -126,6 +126,7 @@ function GameMenuLinks({ withExtras }: { withExtras?: boolean }) {
         <>
           <div className="menu-divider" />
           <a className="menu-item plain" href="/learn">Strategy School</a>
+          <a className="menu-item plain" href="/learn/articles">Articles</a>
           <a className="menu-item plain" href="/learn/glossary">Glossary</a>
           <a className="menu-item plain" href="/legal">Legal &amp; Privacy</a>
         </>

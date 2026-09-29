@@ -25,11 +25,14 @@ export function AboutPage() {
       <section>
         <h2>Where the numbers come from</h2>
         <p>
-          Nothing here is approximated from simulation or copied from a book. The blackjack trainer runs a full
-          recursive expected-value engine for the exact rules dealt (6 decks, dealer stands on all 17s, double
-          after split). Video poker holds are graded by exhaustively evaluating all 32 ways to hold a hand against
-          every possible draw. Ultimate Texas Hold&#39;em river decisions enumerate all 990 possible dealer hands;
-          Three Card Poker enumerates all 18,424. The strategy charts in the{' '}
+          Nothing here is copied from a book — every grade is computed. The blackjack trainer runs a full
+          recursive expected-value engine for the rules dealt (dealer stands on all 17s, double after split,
+          blackjack pays 3:2) using an infinite-deck model, which matches published six-deck basic strategy in
+          every cell but two razor-thin soft doubles and puts the house edge at about 0.6%. Video poker holds
+          are graded exactly, by evaluating all 32 ways to hold a hand against every possible draw. Ultimate
+          Texas Hold&#39;em river and flop decisions enumerate every dealer hand exactly (990 on the river);
+          only the preflop EV estimate is a Monte Carlo sample, and the trainer says so on screen. Three Card
+          Poker enumerates all 18,424 dealer hands. The strategy charts in the{' '}
           <a href="/learn">Strategy School</a> are generated live by the same engines that grade your play, so
           what you study and what you&#39;re tested on can never disagree.
         </p>
