@@ -1,7 +1,7 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/robots.txt", "/sitemap.xml", "/ads.txt", "/favicon*"]
+    "exclude": ["/assets/*", "/robots.txt", "/sitemap.xml", "/ads.txt", "/favicon*", "/og-image.png", "/apple-touch-icon.png"]
   },
   "mimeTypes": {
     ".txt": "text/plain",
