@@ -8,6 +8,7 @@ import { VideoPokerGame } from './games/VideoPokerGame';
 import { houseEdge } from './lib/blackjack/ev';
 import { LearnPage } from './pages/LearnPage';
 import { LegalPage } from './pages/LegalPage';
+import { StrategyCardPage } from './pages/StrategyCardPage';
 import { SessionProvider, useSession } from './store/session';
 import { COPYRIGHT_OWNER, COPYRIGHT_YEAR, SITE_NAME } from './config';
 
@@ -321,6 +322,7 @@ function Shell() {
   const session = useSession();
   const game = GAMES.find((g) => g.path === route);
   const isLegal = route === 'legal';
+  const isCard = route === 'card' || route === 'blackjack/card';
   const isLearn = route === 'learn' || route.startsWith('learn/');
   const learnTopic = route.startsWith('learn/') ? route.slice(6) : '';
 
@@ -336,6 +338,9 @@ function Shell() {
     }
   }, [game]);
 
+  // the strategy card is chrome-free on purpose: fast to load, nothing but charts
+  if (isCard) return <StrategyCardPage />;
+
   return (
     <>
       <TopBar />
@@ -343,6 +348,7 @@ function Shell() {
         <>
           <div className="crumb-row" style={{ maxWidth: 1240, margin: '0 auto', padding: '14px 24px 0', width: '100%' }}>
             <a href="/">← All games</a>
+            {game.path === 'blackjack' && <a href="/card">Strategy card →</a>}
             <a href={`/learn/${game.path}`}>Study this game&#39;s strategy →</a>
           </div>
           <game.component />
